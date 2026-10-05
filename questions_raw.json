@@ -1,0 +1,2117 @@
+[
+ {
+  "id": "fa14",
+  "term": "Fall 2014",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "sixty_ones",
+    "header": "Q3(a) \u00a0sixty_ones Fall 2014 MT2 Q3(a)",
+    "text": [
+     "Implement sixty_ones, which takes a linked list of integers s and returns the number of times that 6 and 1",
+     "appear consecutively (a 1 directly after a 6).",
+     ""
+    ],
+    "signature": "def sixty_ones(s):\n    \"\"\"Return the number of times that 1 directly follows 6 in linked list s.\n    >>> once = Link(4, Link(6, Link(1, Link(6, Link(0, Link(1))))))\n    >>> twice = Link(1, Link(6, Link(1, once)))\n    >>> thrice = Link(6, twice)\n    >>> [sixty_ones(x) for x in [(), once, twice, thrice]]\n    [0, 1, 2, 3]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def sixty_ones(s):\n    if s == () or s.rest == ():\n        return 0\n    elif s.first == 6 and s.rest.first == 1:\n        return 1 + sixty_ones(s.rest.rest)\n    else:\n        return sixty_ones(s.rest)",
+    "explanation": "A pair needs two elements, so a list with fewer than two cannot contain one; checking s == () first keeps s.rest safe. When the first two are 6 then 1, count it and skip both (the 1 cannot start a new pair); otherwise move on by one.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "no_eleven",
+    "header": "Q3(b) \u00a0no_eleven Fall 2014 MT2 Q3(b)",
+    "text": [
+     "Implement no_eleven, which returns a list of all distinct length-n lists of ones and sixes in which 1 and 1 do",
+     "not appear consecutively.",
+     ""
+    ],
+    "signature": "def no_eleven(n):\n    \"\"\"Return a list of lists of 1's and 6's that do not contain 1 after 1.\n    >>> no_eleven(2)\n    [[6, 6], [6, 1], [1, 6]]\n    >>> no_eleven(3)\n    [[6, 6, 6], [6, 6, 1], [6, 1, 6], [1, 6, 6], [1, 6, 1]]\n    >>> no_eleven(4)[:4]  # first half\n    [[6, 6, 6, 6], [6, 6, 6, 1], [6, 6, 1, 6], [6, 1, 6, 6]]\n    >>> no_eleven(4)[4:]  # second half\n    [[6, 1, 6, 1], [1, 6, 6, 6], [1, 6, 6, 1], [1, 6, 1, 6]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def no_eleven(n):\n    if n == 0:\n        return [[]]\n    elif n == 1:\n        return [[6], [1]]\n    else:\n        a, b = no_eleven(n-1), no_eleven(n-2)\n        return [[6] + s for s in a] + [[1, 6] + s for s in b]",
+    "explanation": "A valid list either starts with 6, followed by any valid list of length n-1, or starts with 1, which must then be followed by a 6 and any valid list of length n-2. The base case for 0 is [[]] (one empty list), not [], so that prefixes have something to attach to. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "slinky",
+    "header": "Q5(a) \u00a0slinky Fall 2014 MT2 Q5(a) \u00b7 adapted: the exam asked you to cross out wrong lines; here you fill blanks and starts is",
+    "text": [
+     "built with a dictionary comprehension instead of starts[index] = ...",
+     "A slinky is an abstract representation of a sequence that uses a transition function to compute each element",
+     "from the previous one. It explicitly stores only the elements that cannot be computed by calling transition,",
+     "in a starts dictionary mapping index to element. Complete the constructor slinky (build starts with a",
+     "dictionary comprehension) and get, which returns the element at index.",
+     "",
+     ""
+    ],
+    "signature": "def slinky(elements, transition):\n    \"\"\"Return a slinky containing elements.\n    >>> t = slinky([2, 4, 10, 20, 40], lambda x: 2*x)\n    >>> starts(t)\n    {0: 2, 2: 10}\n    >>> get(t, 3)\n    20\n    >>> r = slinky(range(3, 10), lambda x: x+1)\n    >>> length(r)\n    7\n    >>> starts(r)\n    {0: 3}\n    >>> get(r, 2)\n    5\n    >>> slinky([], abs)\n    [0, {}, <built-in function abs>]\n    >>> slinky([5, 4, 3], abs)\n    [3, {0: 5, 1: 4, 2: 3}, <built-in function abs>]\n    \"\"\"\n\ndef get(slinky, index):\n    \"\"\"Return the element at index of slinky.\"\"\"",
+    "given": "def length(slinky):\n    return slinky[0]\n\ndef starts(slinky):\n    return slinky[1]\n\ndef transition(slinky):\n    return slinky[2]",
+    "provided": "",
+    "solution": "def length(slinky):\n    return slinky[0]\ndef starts(slinky):\n    return slinky[1]\ndef transition(slinky):\n    return slinky[2]\ndef slinky(elements, transition):\n    starts = {index: elements[index] for index in range(len(elements)) if index == 0 or elements[index] !=",
+    "explanation": "transition(elements[index - 1])}     return [len(elements), starts, transition] def get(slinky, index):     start = index     while start not in starts(slinky):         start = start - 1     value = starts(slinky)[start]     while start < index:         value = transition(slinky)(value)         start = start + 1     return value An element must be stored when it is the first one or when applying transition to the previous element does not produce it. To get an index, walk back to the nearest stored index, look up its value, then apply transition(slinky) once per step forward. Inside get, use the selectors rather than indexing the list directly.",
+    "sol_uses": "built with a dictionary comprehension instead of starts[index] = ..."
+   }
+  ]
+ },
+ {
+  "id": "fa15",
+  "term": "Fall 2015",
+  "questions": [
+   {
+    "qnum": "Q3(c)",
+    "title": "multiples",
+    "header": "Q3(c) \u00a0multiples Fall 2015 MT2 Q3(c) \u00b7 adapted: the found multiples are passed through f as an extra parameter t instead of",
+    "text": [
+     "using nonlocal t",
+     "Implement multiples, which takes a positive integer k and a linked list s of digits from 1 to 9. It returns a",
+     "linked list of all positive n that are multiples of k, greater than k and made up only of digits from s. The digits",
+     "in each n must appear in the same order as in s, and each digit of s can be used at most once in each n. (The",
+     "exam updated t with nonlocal; here f takes the linked list found so far as t and returns the updated one.)",
+     ""
+    ],
+    "signature": "def multiples(k, s):\n    \"\"\"Return a linked list of all multiples of k selected from digits in s.\n    >>> odds = Link(1, Link(3, Link(5, Link(7, Link(9)))))\n    >>> print(multiples(5, odds))\n    (135 15 35)\n    >>> print(multiples(7, odds))\n    (1379 357 35)\n    >>> print(multiples(9, odds))\n    (1359 135)\n    >>> multiples(2, odds)\n    ()\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def multiples(k, s):\n    def f(n, s, t):\n        if s == ():\n            if n > k and n % k == 0:\n                return Link(n, t)\n            return t\n        else:\n            t = f(n, s.rest, t)\n            return f(n * 10 + s.first, s.rest, t)\n    return f(0, s, ())",
+    "explanation": "This is include-or-exclude: for each digit, first explore numbers that skip it, then numbers that append it with n * 10 + s.first. When the digits run out, n is a finished candidate and is put on the front of t if it qualifies. Threading t through both calls (exclude first) reproduces the exam's order, where later finds end up nearer the front.",
+    "sol_uses": "using nonlocal t"
+   },
+   {
+    "qnum": "Q3(e)",
+    "title": "int_set",
+    "header": "Q3(e) \u00a0int_set Fall 2015 MT2 Q3(e)",
+    "text": [
+     "Implement int_set, a higher-order function that takes a list of non-negative integers contents. It returns a",
+     "function that takes a non-negative integer n and returns whether n appears in contents. Clue: every integer",
+     "is a unique sum of powers of 2 (5 = pow(2, 0) + pow(2, 2)). The bits helper encodes a list of nums as a",
+     "chain of functions that take 0 or 1 (whether each power of 2 is used, starting with pow(2, 0)) and finally",
+     "'entry'. You may not use built-in membership tests such as in or index in int_set.",
+     "",
+     ""
+    ],
+    "signature": "def bits(nums):\n    \"\"\"A set of nums represented as a function that takes 'entry', 0, or 1.\n    >>> t = bits([4, 5])  # Contains 4 and 5, but not 2\n    >>> t(0)(0)(1)('entry')  # 4 = 0 * pow(2, 0) + 0 * pow(2, 1) + 1 * pow(2, 2)\n    True\n    >>> t(0)(1)('entry')  # 2 = 0 * pow(2, 0) + 1 * pow(2, 1)\n    False\n    >>> t(1)(0)(1)('entry')  # 5 = 1 * pow(2, 0) + 0 * pow(2, 1) + 1 * pow(2, 2)\n    True\n    \"\"\"\n\ndef int_set(contents):\n    \"\"\"Return a function that represents a set of non-negative integers.\n    >>> int_set([1, 2])(1), int_set([1, 2])(3)  # 1 in [1, 2] but 3 is not\n    (True, False)\n    >>> s = int_set([1, 3, 4, 7, 9])\n    >>> [s(k) for k in range(10)]\n    [False, True, False, True, True, False, False, True, False, True]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def bits(nums):\n    def branch(last):\n        if last == 'entry':\n            return 0 in nums\n        return bits([k // 2 for k in nums if k % 2 == last])\n    return branch\ndef int_set(contents):\n    index = bits(contents)\n    def contains(n):\n        t = index\n        while n:\n            last, n = n % 2, n // 2\n            t = t(last)\n        return t('entry')\n    return contains",
+    "explanation": "Calling branch(last) keeps only the numbers whose lowest bit is last (k % 2 == last) and shifts them right with k // 2, then wraps them in a new bits function. contains peels bits off n the same way (n % 2, then n // 2) and follows the matching branch each time; when n reaches 0, 'entry' asks whether a 0 is left.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa16",
+  "term": "Fall 2016",
+  "questions": [
+   {
+    "qnum": "Q7(a)",
+    "title": "sums",
+    "header": "Q7(a) \u00a0sums Fall 2016 MT2 Q7(a) \u00b7 adapted: y.extend(...) replaced by y = y + ...",
+    "text": [
+     "Implement sums, which takes two positive integers n and k. It returns a list of lists containing all the ways",
+     "that a list of k positive integers can sum to n. Results can appear in any order, so the tests sort them. (The",
+     "exam used y.extend(...); here the list is grown with +.)",
+     "sorted(s) returns a new list of the items of s in increasing order.",
+     ""
+    ],
+    "signature": "def sums(n, k):\n    \"\"\"Return the ways in which K positive integers can sum to N.\n    >>> sums(2, 2)\n    [[1, 1]]\n    >>> sums(2, 3)\n    []\n    >>> sorted(sums(4, 2))\n    [[1, 3], [2, 2], [3, 1]]\n    >>> sorted(sums(5, 3))\n    [[1, 1, 3], [1, 2, 2], [1, 3, 1], [2, 1, 2], [2, 2, 1], [3, 1, 1]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def sums(n, k):\n    if k == 1:\n        return [[n]]\n    y = []\n    for x in range(1, n):\n        y = y + [s + [x] for s in sums(n-x, k-1)]\n    return y",
+    "explanation": "With one number left, the only list is [n]. Otherwise choose the last number x (at least 1 and less than n so the others stay positive), find every list of k-1 positive numbers summing to n-x, and add x to each. Impossible cases fall out naturally: range(1, n) becomes empty.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q7(b)",
+    "title": "sums with lambdas",
+    "header": "Q7(b) \u00a0sums with lambdas Fall 2016 MT2 Q7(b)",
+    "text": [
+     "Why so many lines? Implement f and g for this alternative version of sums. Here f(x, y) returns every list in",
+     "y with each of x, x-1 down to 1 placed on the front, and g(w) builds all length-w lists of numbers from 1 to n.",
+     "f = lambda x, y: ...",
+     "WRITE THE WHOLE LINE, REPLACING ...",
+     ""
+    ],
+    "signature": "def sums(n, k):\n    \"\"\"Return the ways in which K positive integers can sum to N.\n    >>> sums(2, 2)\n    [[1, 1]]\n    >>> sums(4, 2)\n    [[3, 1], [2, 2], [1, 3]]\n    >>> sums(5, 3)\n    [[3, 1, 1], [2, 2, 1], [2, 1, 2], [1, 3, 1], [1, 2, 2], [1, 1, 3]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "f = lambda x, y: (x and [[x] + z for z in y] + f(x-1, y)) or []\ndef sums(n, k):\n    g = lambda w: (w and f(n, g(w-1))) or [[]]\n    return [v for v in g(k) if sum(v) == n]",
+    "explanation": "x and A or [] acts as an if: when x is 0 it gives [], otherwise it puts x on the front of every list z in y and recurses with x-1 on the same y. g(w) uses f(n, g(w-1)) to extend every length w-1 list with each of n, ..., 1, starting from [[]]; sums then filters by total.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa17",
+  "term": "Fall 2017",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "splice",
+    "header": "Q3(a) \u00a0splice Fall 2017 MT2 Q3(a)",
+    "text": [
+     "Implement splice, which takes two lists a and b and a non-negative integer k no greater than len(a). It",
+     "returns a new list containing the first k elements of a, then all elements of b, then the remaining elements of",
+     "a.",
+     ""
+    ],
+    "signature": "def splice(a, b, k):\n    \"\"\"Return a list of the first k elements of a, then all of b, then the rest of a.\n    >>> splice([2, 3, 4, 5], [6, 7], 2)\n    [2, 3, 6, 7, 4, 5]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def splice(a, b, k):\n    return a[:k] + b + a[k:]",
+    "explanation": "Slicing makes new lists, so a[:k] is the first k elements and a[k:] is the rest. Adding lists with + concatenates them without changing a or b.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "all_splice",
+    "header": "Q3(b) \u00a0all_splice Fall 2017 MT2 Q3(b)",
+    "text": [
+     "Implement all_splice, which returns a list of all the non-negative integers k such that splicing list b into list",
+     "a at k creates a list with the same contents as c. Assume splice is implemented correctly.",
+     ""
+    ],
+    "signature": "def all_splice(a, b, c):\n    \"\"\"Return a list of all k such that splicing b into a at position k gives c.\n    >>> all_splice([1, 2], [3, 4], [1, 3, 4, 2])\n    [1]\n    >>> all_splice([1, 2, 1, 2], [1, 2], [1, 2, 1, 2, 1, 2])\n    [0, 2, 4]\n    \"\"\"",
+    "given": "",
+    "provided": "splice(a, b, k) from part (a) is predefined.",
+    "solution": "def all_splice(a, b, c):\n    return [k for k in range(len(a) + 1) if splice(a, b, k) == c]",
+    "explanation": "Valid positions run from 0 up to and including len(a), hence range(len(a) + 1). The comprehension keeps each k whose splice equals c; == on lists compares contents.",
+    "sol_uses": "Uses code provided by the exam: splice(a, b, k) from part (a) is predefined."
+   },
+   {
+    "qnum": "Q3(c)",
+    "title": "splink",
+    "header": "Q3(c) \u00a0splink Fall 2017 MT2 Q3(c)",
+    "text": [
+     "Implement splink, which takes two linked lists a and b and a non-negative integer k no greater than the",
+     "length of a. It returns a linked list containing the first k elements of a, then all elements of b, then the",
+     "remaining elements of a. You may not use len, in, for, list, slicing, element selection, addition or list",
+     "comprehensions.",
+     ""
+    ],
+    "signature": "def splink(a, b, k):\n    \"\"\"Return a Link containing the first k elements of a, then all of b, then the rest of a.\n    >>> print(splink(Link(2, Link(3, Link(4, Link(5)))), Link(6, Link(7)), 2))\n    (2 3 6 7 4 5)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def splink(a, b, k):\n    if b == ():\n        return a\n    elif k == 0:\n        return Link(b.first, splink(a, b.rest, k))\n    return Link(a.first, splink(a.rest, b, k - 1))",
+    "explanation": "Once b is used up, the rest of a is the answer. While k is positive, take an element of a and count down; when k reaches 0, take elements of b one at a time (leaving k at 0) until b runs out.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(a)",
+    "title": "both",
+    "header": "Q4(a) \u00a0both Fall 2017 MT2 Q4(a)",
+    "text": [
+     "Implement both, which takes two sorted linked lists and returns whether some value is in both of them. You",
+     "may not use len, in, for, list, slicing, element selection, addition or list comprehensions.",
+     ""
+    ],
+    "signature": "def both(a, b):\n    \"\"\"Return whether there is any value that appears in both a and b, two sorted Link instances.\n    >>> both(Link(1, Link(3, Link(5, Link(7)))), Link(2, Link(4, Link(6))))\n    False\n    >>> both(Link(1, Link(3, Link(5, Link(7)))), Link(2, Link(7, Link(9))))  # both have 7\n    True\n    >>> both(Link(1, Link(4, Link(5, Link(7)))), Link(2, Link(4, Link(5))))  # both have 4 and 5\n    True\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def both(a, b):\n    if a == () or b == ():\n        return False\n    if a.first > b.first:\n        a, b = b, a\n    return a.first == b.first or both(a.rest, b)",
+    "explanation": "The swap guarantees a.first is the smaller first element. If the two firsts are equal we found a common value; otherwise a.first is smaller than everything in b (it is sorted), so it can be dropped with both(a.rest, b). ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(c)",
+    "title": "ways",
+    "header": "Q4(c) \u00a0ways Fall 2017 MT2 Q4(c)",
+    "text": [
+     "Implement ways, which takes two values start and end, a non-negative integer k and a list of one-argument",
+     "functions actions. It returns the number of ways of choosing functions f1, ..., fj from actions such that",
+     "f1(f2(...(fj(start)))) equals end and j \u2264 k. The same action may be chosen many times. Once a sequence of",
+     "actions reaches end, no further actions can be applied.",
+     ""
+    ],
+    "signature": "def ways(start, end, k, actions):\n    \"\"\"Return the number of ways of reaching end from start by taking up to k actions.\n    >>> ways(-1, 1, 5, [abs, lambda x: x+2])  # abs(-1) or -1+2, but not abs(abs(-1))\n    2\n    >>> ways(1, 10, 5, [lambda x: x+1, lambda x: x+4])  # 1+1+4+4, 1+4+4+1, or 1+4+1+4\n    3\n    >>> ways(1, 20, 5, [lambda x: x+1, lambda x: x+4])\n    0\n    >>> ways([3], [2, 3, 2, 3], 4, [lambda x: [2]+x, lambda x: 2*x, lambda x: x[:-1]])\n    3\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def ways(start, end, k, actions):\n    if start == end:\n        return 1\n    elif k == 0:\n        return 0\n    return sum([ways(f(start), end, k - 1, actions) for f in actions])",
+    "explanation": "Check for success before checking the budget, so reaching end with exactly k actions still counts and no action is applied after reaching it. Each action is one branch of the tree recursion: apply it to start, spend one action, and sum the counts over all branches.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa18",
+  "term": "Fall 2018",
+  "questions": [
+   {
+    "qnum": "Q2",
+    "title": "lowest",
+    "header": "Q2 \u00a0lowest Fall 2018 MT2 Q2",
+    "text": [
+     "Implement lowest, which takes a list of numbers s and returns a list of only the elements of s with the",
+     "smallest absolute value.",
+     ""
+    ],
+    "signature": "def lowest(s):\n    \"\"\"Return a list of the elements in s with the smallest absolute value.\n    >>> lowest([3, -2, 2, -3, -4, 2, 3, 4])\n    [-2, 2, 2]\n    >>> lowest(range(-5, 5))\n    [0]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def lowest(s):\n    return (lambda y: [x for x in s if abs(x)==y])(abs(min(s, key=abs)))",
+    "explanation": "Read it from the right: min(s, key=abs) finds an element with the smallest absolute value (it might be negative), and the outer abs turns it into that smallest absolute value. The lambda is called immediately with that value as y and keeps every element whose absolute value equals it.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(a)",
+    "title": "plus",
+    "header": "Q4(a) \u00a0plus Fall 2018 MT2 Q4(a)",
+    "text": [
+     "A plus expression for a non-negative integer n is made by inserting + symbols between digits of n so that there",
+     "are never more than two consecutive digits. For 2018, 20+1+8 has value 29 and 2+01+8 has value 11 (a two-",
+     "digit number starting with 0 is just its last digit). Implement plus, which returns the largest value of any plus",
+     "expression for n.",
+     ""
+    ],
+    "signature": "def plus(n):\n    \"\"\"Return the largest sum that results from inserting +'s into n.\n    >>> plus(123456)     # 12 + 34 + 56 = 102\n    102\n    >>> plus(1604)       # 1 + 60 + 4 = 65\n    65\n    >>> plus(160450)     # 1 + 60 + 4 + 50 = 115\n    115\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def plus(n):\n    if n:\n        return max(n % 10 + plus(n // 10), n % 100 + plus(n // 100))\n    return 0",
+    "explanation": "The last term of a plus expression is either the last digit (n % 10) or the last two digits (n % 100), and the rest of the expression is a plus expression for the digits left over. Taking the larger of the two choices, each with the best value for what remains, gives the maximum. For a one-digit n both choices give n because n // 100 is 0.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "plusses",
+    "header": "Q4(b) \u00a0plusses Fall 2018 MT2 Q4(b)",
+    "text": [
+     "Using the same plus expressions as plus, implement plusses, which takes non-negative integers n and cap",
+     "and returns the number of plus expressions for n that have a value less than cap.",
+     ""
+    ],
+    "signature": "def plusses(n, cap):\n    \"\"\"Return the number of plus expressions for n with values below cap.\n    >>> plusses(123, 16)  # 1+2+3=6 and 12+3=15, but 1+23=24 isn't below cap.\n    2\n    >>> plusses(2018, 38) # 2+0+1+8, 20+1+8, 2+0+18, and 2+01+8, but not 20+18.\n    4\n    >>> plusses(1, 2)\n    1\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def plusses(n, cap):\n    if n < 10 and n < cap:\n        return 1\n    elif cap <= 0:\n        return 0\n    else:\n        return plusses(n // 10, cap - n % 10) + plusses(n // 100, cap - n % 100)",
+    "explanation": "Count both choices for the last term, subtracting its value from the cap so the rest must stay below what is left. A single digit below the cap is exactly one valid expression. Once the cap has dropped to 0 or below nothing can fit, which also stops two-digit numbers whose remaining part is n // 100 == 0 from being counted when they are too big. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "tally",
+    "header": "Q5(a) \u00a0tally Fall 2018 MT2 Q5(a) \u00b7 adapted: only the tally line; Poll is a data class built with its votes dictionary (the mutating",
+    "text": [
+     "vote method and class attribute are gone), so tally takes the list of polls",
+     "A Poll has a name and a dictionary votes from each choice to the number of votes it received. Implement",
+     "tally, which takes a list of polls and a choice c and returns a list of (poll name, vote count) pairs for c,",
+     "one for each poll in which c received votes, in the order of polls.",
+     ""
+    ],
+    "signature": "def tally(polls, c):\n    \"\"\"Tally all votes for a choice c as a list of (poll name, vote count) pairs.\n    >>> a = Poll('A', {'dog': 2, 'cat': 1})\n    >>> b = Poll('B', {'cat': 1})\n    >>> c = Poll('C', {'dog': 1})\n    >>> tally([a, b, c], 'dog')\n    [('A', 2), ('C', 1)]\n    >>> tally([a, b, c], 'cat')\n    [('A', 1), ('B', 1)]\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: @dataclass Poll(name, votes), where votes maps each choice to its number of votes.",
+    "solution": "def tally(polls, c):\n    return [(p.name, p.votes[c]) for p in polls if c in p.votes]",
+    "explanation": "One comprehension builds a tuple per poll. The if c in p.votes filter matters: looking up p.votes[c] for a poll that never saw c would raise a KeyError, and the doctests show such polls are left out rather than listed with 0.",
+    "sol_uses": "vote method and class attribute are gone), so tally takes the list of polls Uses code provided by the exam: Predefined: @dataclass Poll(name, votes), where votes maps each choice to its number of votes."
+   },
+   {
+    "qnum": "Q6",
+    "title": "replace (Dr. Frankenlink)",
+    "header": "Q6 \u00a0replace (Dr. Frankenlink) Fall 2018 MT2 Q6 \u00b7 adapted: returns a new linked list instead of mutating s (the exam",
+    "text": [
+     "spliced t into s with s.rest = ...)",
+     "Implement replace, which takes two non-empty linked lists s and t and positive integers i and j with i < j.",
+     "It returns a new linked list in which the elements of s with indices from i up to but not including j are",
+     "replaced by the elements of t. Neither s nor t may be changed. Assume s has at least j elements.",
+     ""
+    ],
+    "signature": "def replace(s, t, i, j):\n    \"\"\"Return s with the slice from i to j replaced by the elements of t.\n    >>> s, t = Link(3, Link(4, Link(5, Link(6, Link(7))))), Link(0, Link(1, Link(2)))\n    >>> print(replace(s, t, 2, 4))\n    (3 4 0 1 2 7)\n    >>> print(s)\n    (3 4 5 6 7)\n    >>> print(t)\n    (0 1 2)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def replace(s, t, i, j):\n    if i > 0:\n        return Link(s.first, replace(s.rest, t, i - 1, j - 1))\n    elif j > 0:\n        return replace(s.rest, t, i, j - 1)\n    elif t != ():\n        return Link(t.first, replace(s, t.rest, i, j))\n    else:\n        return s",
+    "explanation": "Count down both indices as you walk along s. While i > 0, keep the element; once i reaches 0, drop elements until j also reaches 0; then copy the elements of t one by one, and finally attach whatever is left of s. Every kept element goes into a new Link, so neither input is changed.",
+    "sol_uses": "spliced t into s with s.rest = ...)"
+   }
+  ]
+ },
+ {
+  "id": "fa19",
+  "term": "Fall 2019",
+  "questions": [
+   {
+    "qnum": "Q4",
+    "title": "stable",
+    "header": "Q4 \u00a0stable Fall 2019 MT2 Q4",
+    "text": [
+     "Implement stable, which takes a list of numbers s, a positive integer k and a non-negative number n. It",
+     "returns whether all pairs of values in s whose indices differ by at most k have an absolute difference of at",
+     "most n. Recall max([]) is an error, all([]) is True and any([]) is False.",
+     ""
+    ],
+    "signature": "def stable(s, k, n):\n    \"\"\"Return whether all pairs of elements of S within distance K differ by at most N.\n    >>> stable([1, 2, 3, 5, 6], 1, 2)  # All adjacent values differ by at most 2.\n    True\n    >>> stable([1, 2, 3, 5, 6], 2, 2)  # abs(5-2) is a difference of 3.\n    False\n    >>> stable([1, 5, 1, 5, 1], 2, 2)  # abs(5-1) is a difference of 4.\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def stable(s, k, n):\n    for i in range(len(s)):\n        near = range(max(0, i - k), i)\n        if any([abs(s[i] - s[j]) > n for j in near]):\n            return False\n    return True",
+    "explanation": "For each index i, compare s[i] with the up to k earlier elements; looking only backwards still covers every pair once. max(0, i - k) stops the range from starting at a negative index, which would wrap around to the end of the list. any is true as soon as one nearby pair differs by more than n.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "partitions",
+    "header": "Q5(a) \u00a0partitions Fall 2019 MT2 Q5(a) \u00b7 adapted: the generator became a function returning a list; each yield becomes",
+    "text": [
+     "result = result + [...] and yield from becomes result = result + partitions(...)",
+     "Implement partitions, which takes positive integers n and m and returns a list of strings describing all",
+     "partitions of n using parts up to size m. Each partition is a sum of non-increasing positive integers at most m",
+     "that totals n, and each appears exactly once.",
+     "",
+     ""
+    ],
+    "signature": "def partitions(n, m):\n    \"\"\"Return a list of all partitions of N using parts up to size M.\n    >>> partitions(1, 1)\n    ['1']\n    >>> partitions(2, 2)\n    ['2', '1 + 1']\n    >>> partitions(4, 2)\n    ['2 + 2', '2 + 1 + 1', '1 + 1 + 1 + 1']\n    >>> for p in partitions(6, 4):\n    ...     print(p)\n    4 + 2\n    4 + 1 + 1\n    3 + 3\n    3 + 2 + 1\n    3 + 1 + 1 + 1\n    2 + 2 + 2\n    2 + 2 + 1 + 1\n    2 + 1 + 1 + 1 + 1\n    1 + 1 + 1 + 1 + 1 + 1\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "result = result + [...] and yield from becomes result = result + partitions(...)\ndef partitions(n, m):\n    result = []\n    if n == m:\n        result = result + [str(m)]\n    if n > 0 and m > 0:\n        for p in partitions(n - m, m):\n            result = result + [str(m) + ' + ' + p]\n        result = result + partitions(n, m - 1)\n    return result",
+    "explanation": "This is count_partitions building strings instead of counting. If n == m, the single part m is a partition by itself. Otherwise either use a part of size m (partition the remaining n - m with parts still up to m, and put m + in front of each) or skip size m entirely with partitions(n, m - 1). Putting the biggest part first keeps each string non-increasing, so nothing is listed twice.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6",
+    "title": "switch",
+    "header": "Q6 \u00a0switch Fall 2019 MT2 Q6",
+    "text": [
+     "A switch list for two lists s and t of the same length is a list whose element at each index i is either s[i] or",
+     "t[i]. Its switch count is the number of indices where the source list changes from the previous index; index 0",
+     "counts 1 if it comes from t. Implement switch, which returns the switch list with the largest sum whose",
+     "switch count is at most k.",
+     ""
+    ],
+    "signature": "def switch(s, t, k):\n    \"\"\"Return the list with the largest sum built by switching between S and T at most K times.\n    >>> switch([1, 2, 7], [3, 4, 5], 0)\n    [1, 2, 7]\n    >>> switch([1, 2, 7], [3, 4, 5], 1)\n    [3, 4, 5]\n    >>> switch([1, 2, 7], [3, 4, 5], 2)\n    [3, 4, 7]\n    >>> switch([1, 2, 7], [3, 4, 5], 3)\n    [3, 4, 7]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def switch(s, t, k):\n    if k == 0 or len(s) == 0:\n        return s\n    else:\n        a = switch(t, s, k-1)\n        b = s[:1] + switch(s[1:], t[1:], k)\n        return max(a, b, key=sum)",
+    "explanation": "The current list is always s, so with no switches left you must take s as it is. Option a spends a switch by swapping the roles of the two lists without consuming an element. Option b takes the first element from s and continues on both rests with the same k; max(..., key=sum) keeps the better list.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa20",
+  "term": "Fall 2020",
+  "questions": [
+   {
+    "qnum": "Q2(b)",
+    "title": "filter_index",
+    "header": "Q2(b) \u00a0filter_index Fall 2020 MT2 Q2(b) \u00b7 Link.empty written as ()",
+    "text": [
+     "The index of an element of a linked list s is the number of .rests needed to reach it: in Link(5, Link(7,",
+     "Link(9))), 5 has index 0 and 9 has index 2. Implement filter_index, which takes a one-argument function",
+     "f and a linked list s, and returns a linked list of the elements of s whose index i makes f(i) a true value.",
+     ""
+    ],
+    "signature": "def filter_index(f, s):\n    \"\"\"Return a Link containing the elements of Link s that have an index i for\n    which f(i) is a true value.\n    >>> powers = Link(1, Link(2, Link(4, Link(8, Link(16, Link(32))))))\n    >>> print(filter_index(lambda x: x < 4, powers))\n    (1 2 4 8)\n    >>> print(filter_index(lambda x: x % 2 == 1, powers))\n    (2 8 32)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def filter_index(f, s):\n    def helper(i, s):\n        if s == ():\n            return s\n        filtered_rest = helper(i + 1, s.rest)\n        if f(i):\n            return Link(s.first, filtered_rest)\n        else:\n            return filtered_rest\n    return helper(0, s)",
+    "explanation": "The helper carries the current index i as an extra parameter, so the rest of the list is processed with i + 1. The filter is applied to the index, f(i), not to the element. The outer function starts the count at 0.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(a)",
+    "title": "sparse_list (SparseList __init__)",
+    "header": "Q3(a) \u00a0sparse_list (SparseList __init__) Fall 2020 MT2 Q3(a) \u00b7 adapted: SparseList is a data class with fields n,",
+    "text": [
+     "common and others, and the exam's __init__ became the function",
+     "sparse_list",
+     "A SparseList represents a non-empty list s by its length n, its most common value common, and a dictionary",
+     "others that has a value for every element of s that is not common; the key is that element's index in s.",
+     "Implement sparse_list, which takes s and returns the matching SparseList.",
+     ""
+    ],
+    "signature": "def sparse_list(s):\n    \"\"\"Represent non-empty list s as its length, its most common value and a\n    dictionary from indices to values that contains only values that are not\n    the most common.\n    >>> pi = sparse_list([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5])\n    >>> pi.common\n    5\n    >>> pi.others\n    {0: 3, 1: 1, 2: 4, 3: 1, 5: 9, 6: 2, 7: 6, 9: 3}\n    >>> pi.n\n    11\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: @dataclass SparseList(n, common, others) and most_common(s), which returns the most common element of non-empty list s (ties go to the one that appears first).",
+    "solution": "def sparse_list(s):\n    assert s, 's cannot be empty'\n    n = len(s)\n    common = most_common(s)\n    others = {i: s[i] for i in range(len(s)) if s[i] != common}\n    return SparseList(n, common, others)",
+    "explanation": "The dictionary comprehension walks over every index of s; the key is the index i and the value is s[i]. The if clause keeps only values that differ from the most common one, so those positions can be recovered from common instead. ",
+    "sol_uses": "common and others, and the exam's __init__ became the function sparse_list Uses code provided by the exam: Predefined: @dataclass SparseList(n, common, others) and most_common(s), which returns the most common element of non-empty list s (ties go to the one that appears first)."
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "item",
+    "header": "Q3(b) \u00a0item Fall 2020 MT2 Q3(b) \u00b7 adapted: the item method became a function taking the SparseList as its first argument",
+    "text": [
+     "Implement item, which takes a SparseList sparse representing a list s and a non-negative integer i, and",
+     "returns s[i], or the string 'out of range' if i is not smaller than the length of s.",
+     ""
+    ],
+    "signature": "def item(sparse, i):\n    \"\"\"Return s[i] or 'out of range' if i is not smaller than the length of s,\n    where sparse represents s.\n    >>> pi = sparse_list([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5])\n    >>> [item(pi, 0), item(pi, 1), item(pi, 2), item(pi, 3), item(pi, 4)]\n    [3, 1, 4, 1, 5]\n    >>> item(pi, 10)\n    5\n    >>> item(pi, 11)\n    'out of range'\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: @dataclass SparseList(n, common, others), most_common(s) and sparse_list(s) from part (a).",
+    "solution": "def item(sparse, i):\n    assert i >= 0, 'index i must be non-negative'\n    if i >= sparse.n:\n        return 'out of range'\n    elif i in sparse.others:\n        return sparse.others[i]\n    else:\n        return sparse.common",
+    "explanation": "Check the length first so an index past the end never reaches the dictionary. If i is a key of others, that position holds an uncommon value; otherwise it must hold common. Note that in on a dictionary checks keys, which here are indices.",
+    "sol_uses": "Uses code provided by the exam: Predefined: @dataclass SparseList(n, common, others), most_common(s) and sparse_list(s) from part (a)."
+   },
+   {
+    "qnum": "Q3(c)",
+    "title": "items",
+    "header": "Q3(c) \u00a0items Fall 2020 MT2 Q3(c) \u00b7 adapted: the items method became a function taking the SparseList",
+    "text": [
+     "Implement items, which takes a SparseList representing s and returns a list with the same elements as s in",
+     "the same order. Don't repeat yourself.",
+     ""
+    ],
+    "signature": "def items(sparse):\n    \"\"\"Return a list with the same elements as s in the same order as s,\n    where sparse represents s.\n    >>> pi = sparse_list([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5])\n    >>> items(pi)\n    [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: @dataclass SparseList(n, common, others), most_common(s), sparse_list(s) from part (a) and item(sparse, i) from part (b).",
+    "solution": "def items(sparse):\n    return [item(sparse, i) for i in range(sparse.n)]",
+    "explanation": "Every position from 0 to n - 1 is either in others or holds common, and item from part (b) already makes that choice. Reusing it is the \"don't repeat yourself\" hint; the range must use the stored length sparse.n.",
+    "sol_uses": "Uses code provided by the exam: Predefined: @dataclass SparseList(n, common, others), most_common(s), sparse_list(s) from part (a) and item(sparse, i) from part (b)."
+   }
+  ]
+ },
+ {
+  "id": "fa21",
+  "term": "Fall 2021",
+  "questions": [
+   {
+    "qnum": "Q2(a)",
+    "title": "change",
+    "header": "Q2(a) \u00a0change Fall 2021 MT2 Q2(a) \u00b7 adapted: coins.pop() replaced by coins[-1] and slicing, so coins is not modified",
+    "text": [
+     "Implement change, which takes an integer n and a list of positive integers coins. It returns whether there is a",
+     "subset of the values in coins that sums to n. (The exam removed the last coin with coins.pop() and copied",
+     "the list in the recursive calls; here you slice instead.)",
+     ""
+    ],
+    "signature": "def change(n, coins):\n    \"\"\"Return whether a subset of coins adds up to n.\n    >>> change(10, [2, 7, 1, 8, 2]) # e.g., 2 + 8\n    True\n    >>> change(20, [2, 7, 1, 8, 2]) # e.g., 2 + 7 + 1 + 8 + 2\n    True\n    >>> change(6, [2, 7, 1, 8, 2]) # Impossible; only two 2's in coins\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def change(n, coins):\n    if n == 0:\n        return True\n    elif n < 0 or not coins:\n        return False\n    coin = coins[-1]\n    return change(n, coins[:-1]) or change(n - coin, coins[:-1])",
+    "explanation": "Include or exclude the last coin: skip it (same n) or use it (n - coin); either way the rest of the coins is coins[:-1], a new list. Fail when the amount goes negative or no coins are left; not coins alone also works because a negative n eventually runs out of coins.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q2(b)",
+    "title": "amounts",
+    "header": "Q2(b) \u00a0amounts Fall 2021 MT2 Q2(b)",
+    "text": [
+     "Implement amounts, which takes a list of positive integers coins. It returns a sorted list of all unique non-",
+     "negative integers n for which change(n, coins) returns True. You may not call change. The given code calls",
+     "sorted(s), which returns a new list of the items of s in increasing order.",
+     "sorted(s) returns a new list of the items of s in increasing order.",
+     ""
+    ],
+    "signature": "def amounts(coins):\n    \"\"\"List all unique n such that change(n, coins) returns True (in sorted order).\n    >>> amounts([2, 5, 3])\n    [0, 2, 3, 5, 7, 8, 10]\n    >>> amounts([2, 7, 1, 8, 2])\n    [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def amounts(coins):\n    if not coins:\n        return [0]\n    coin = coins[0]\n    rest = amounts(coins[1:])\n    return sorted(rest + [k + coin for k in rest if k + coin not in rest])",
+    "explanation": "With no coins only 0 is reachable. Every amount reachable without the first coin (rest) is still reachable, and adding the first coin to each gives the amounts that use it. The filter k + coin not in rest keeps the result free of duplicates.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(a)",
+    "title": "snap",
+    "header": "Q4(a) \u00a0snap Fall 2021 MT2 Q4(a) \u00b7 reference answer uses a comprehension instead of zip and map",
+    "text": [
+     "Implement snap, which takes one-argument functions f and g and a sequence s. It returns a list of (x, f(x))",
+     "pairs for all x in s for which g(f(x)) is a true value. Your implementation may only call f once on each",
+     "element of s.",
+     ""
+    ],
+    "signature": "def snap(f, g, s):\n    \"\"\"Return a list of (x, f(x)) pairs for each x in s such that g(f(x)) is a true value.\n    >>> snap(lambda x: x * x, lambda x: x < 10, range(5))\n    [(0, 0), (1, 1), (2, 4), (3, 9)]\n    >>> snap(lambda x: x * x, lambda x: x > 10, range(5))\n    [(4, 16)]\n    >>> snap(lambda x: x * x, lambda x: x and x - 9, range(5))\n    [(1, 1), (2, 4), (4, 16)]\n    \"\"\"",
+    "given": "",
+    "provided": "For the extra test, square_counting squares its argument and records each call in the list calls.",
+    "solution": "def snap(f, g, s):\n    return [(x, y) for x, y in [(x, f(x)) for x in s] if g(y)]",
+    "explanation": "Build each pair (x, f(x)) once in an inner comprehension, then unpack it as x, y so both the filter g(y) and the result (x, y) reuse y instead of calling f again. The original exam used zip(s, map(f, s)) for the same pairs. ",
+    "sol_uses": "Uses code provided by the exam: For the extra test, square_counting squares its argument and records each call in the list calls."
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "max_diff",
+    "header": "Q4(b) \u00a0max_diff Fall 2021 MT2 Q4(b) \u00b7 order-of-growth part left out",
+    "text": [
+     "Implement max_diff, which takes a non-empty sequence s and a one-argument function f. It returns a pair",
+     "of elements (v, w) in s for which f(v) - f(w) is largest. v and w may be the same or different elements of s.",
+     ""
+    ],
+    "signature": "def max_diff(s, f):\n    \"\"\"Return two elements (v, w) of s for which f(v) - f(w) is largest.\n    >>> max_diff(range(-7, 4), lambda x: x * x) # (-7 * -7) - (0 * 0) = 49\n    (-7, 0)\n    >>> max_diff(['what', 'a', 'great', 'film'], len) # len('great') - len('a')\n    ('great', 'a')\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def max_diff(s, f):\n    assert s, 's cannot be empty'\n    v, w = None, None\n    for x in s:\n        for y in s:\n            if v is None or f(x) - f(y) > f(v) - f(w):\n                v, w = x, y\n    return v, w",
+    "explanation": "The nested loops try every pair (x, y), and (v, w) remembers the best pair so far. The v is None check fills in the first pair; after that, replace the best pair whenever the new difference is larger. Assign both names at once with tuple assignment.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(c)",
+    "title": "max_diff_fast",
+    "header": "Q4(c) \u00a0max_diff_fast Fall 2021 MT2 Q4(c)",
+    "text": [
+     "Implement max_diff_fast, which has the same signature and behaviour as max_diff but a faster order of",
+     "growth. You may not use a list comprehension.",
+     ""
+    ],
+    "signature": "def max_diff_fast(s, f):\n    \"\"\"Return two elements (v, w) of s for which f(v) - f(w) is largest.\n    >>> max_diff_fast(range(-7, 4), lambda x: x * x)\n    (-7, 0)\n    >>> max_diff_fast(['what', 'a', 'great', 'film'], len)\n    ('great', 'a')\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def max_diff_fast(s, f):\n    return max(s, key=f), min(s, key=f)",
+    "explanation": "f(v) - f(w) is largest when f(v) is as big as possible and f(w) as small as possible, and the two choices are independent. max and min with key=f return the element itself (not its f value) in one pass each.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa22",
+  "term": "Fall 2022",
+  "questions": [
+   {
+    "qnum": "Q3(b)",
+    "title": "roll_dice",
+    "header": "Q3(b) \u00a0roll_dice Fall 2022 MT2 Q3(b) \u00b7 adapted: dice is a zero-argument function (as in Hog) instead of an iterator",
+    "text": [
+     "Implement roll_dice, which takes a positive integer num_rolls and a dice function. It returns the points",
+     "scored by rolling the dice num_rolls times: the sum of the outcomes, or 1 if any outcome is a 1 (Sow Sad).",
+     "The exam used next(dice) on an iterator; here each roll is dice().",
+     ""
+    ],
+    "signature": "def roll_dice(num_rolls, dice):\n    \"\"\"Return the number of points scored by rolling dice num_rolls times.\n    >>> dice = make_test_dice([6, 6, 6, 6, 6, 1])\n    >>> roll_dice(5, dice) # 6, 6, 6, 6, 6\n    30\n    >>> roll_dice(5, dice) # 1, 6, 6, 6, 6\n    1\n    >>> roll_dice(2, dice) # 6, 1\n    1\n    >>> roll_dice(10, make_test_dice([2, 4, 3])) # 2, 4, 3, 2, 4, 3, 2, 4, 3, 2\n    29\n    \"\"\"",
+    "given": "",
+    "provided": "make_test_dice(outcomes) is predefined. As in Project 1 Hog, it returns a zero-argument dice function: each call dice() returns the next outcome, cycling through the list.",
+    "solution": "def roll_dice(num_rolls, dice):\n    rolls = [dice() for _ in range(num_rolls)]\n    if 1 in rolls:\n        return 1\n    return sum(rolls)",
+    "explanation": "Roll all the dice first so every roll is used up even when a 1 appears (the second doctest depends on the dice continuing where it left off). Then in checks for a 1 and sum adds the outcomes.",
+    "sol_uses": "Uses code provided by the exam: make_test_dice(outcomes) is predefined. As in Project 1 Hog, it returns a zero- argument dice function: each call dice() returns the next outcome, cycling through the list."
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "count_subsets",
+    "header": "Q5(a) \u00a0count_subsets Fall 2022 MT2 Q5(a) \u00b7 the exam's doctest on range(1, 10000) is left out (too slow for this",
+    "text": [
+     "version)",
+     "count_subsets takes a list of positive integers s. It returns the number of lists that sum to 100 and contain a",
+     "subset of the elements of s in order.",
+     ""
+    ],
+    "signature": "def count_subsets(s):\n    \"\"\"\n    >>> count_subsets([25, 50, 75, 100, 125, 150]) # [25, 75], [100]\n    2\n    >>> count_subsets([25, 50, 25, 75]) # [25, 75] (first 25), [25, 75] (second 25), [25, 50, 25]\n    3\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def count_subsets(s):\n    def helper(sum_so_far, index):\n        if index == len(s):\n            if sum_so_far == 100:\n                return 1\n            return 0\n        return helper(sum_so_far, index + 1) + helper(sum_so_far+s[index], index + 1)\n    return helper(0,0)",
+    "explanation": "Include or exclude s[index]: skip it (sum unchanged) or take it (add it to the sum); both move to the next index. Only when every element has been decided do you check whether the sum hit exactly 100. The index replaces slicing, so s itself never changes.",
+    "sol_uses": "version)"
+   },
+   {
+    "qnum": "Q6(a)",
+    "title": "destinations",
+    "header": "Q6(a) \u00a0destinations Fall 2022 MT2 Q6(a) \u00b7 adapted: the Graph class method is now a function on a list of edge tuples",
+    "text": [
+     "A directed graph's edges are stored as a list of (source, destination) tuples. Node j is a destination of",
+     "node i if there is an edge from i to j. Return a list of all destinations of source, in the order the edges",
+     "appear. (On the exam this was Graph.destinations with self.edges.)",
+     ""
+    ],
+    "signature": "def destinations(edges, source):\n    \"\"\"Returns a list of all destinations of the given node.\n    >>> edges = [(0, 1), (0, 2), (1, 4), (2, 0), (4, 2), (5, 4), (5, 5)]\n    >>> destinations(edges, 0)\n    [1, 2]\n    >>> destinations(edges, 5)\n    [4, 5]\n    >>> destinations(edges, 3)\n    []\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def destinations(edges, source):\n    return [i[1] for i in edges if i[0] == source]",
+    "explanation": "Each edge is a 2-tuple: index 0 is the source and index 1 the destination. Filter on the source, keep the destination. Unpacking for s, d in edges is a cleaner way to write the same thing.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa23",
+  "term": "Fall 2023",
+  "questions": [
+   {
+    "qnum": "Q4(a)",
+    "title": "fit",
+    "header": "Q4(a) \u00a0fit Fall 2023 MT2 Q4(a)",
+    "text": [
+     "A perfect square is k*k for some integer k. Implement fit, which takes positive integers total and n. It",
+     "returns True or False indicating whether there are n positive perfect squares that sum to total. The perfect",
+     "squares need not be unique.",
+     ""
+    ],
+    "signature": "def fit(total, n):\n    \"\"\"Return whether there are n positive perfect squares that sums to total.\n    >>> [fit(4, 1), fit(4, 2), fit(4, 3), fit(4, 4)] # 1*(2*2) for n=1; 4*(1*1) for n=4\n    [True, False, False, True]\n    >>> [fit(12, n) for n in range(3, 8)] # 3*(2*2), 3*(1*1)+3*3, 4*(1*1)+2*(2*2)\n    [True, True, False, True, False]\n    >>> [fit(32, 2), fit(32, 3), fit(32, 4), fit(32, 5)] # 2*(4*4), 3*(1*1)+2*2+5*5\n    [True, False, False, True]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def fit(total, n):\n    def f(total, n, k):\n        if total == n * k * k:\n            return True\n        elif total < k * k:\n            return False\n        else:\n            return f(total - k * k, n - 1, k) or f(total, n, k + 1)\n    return f(total, n, 1)",
+    "explanation": "The helper only uses squares of at least k*k. Either use k*k once more (subtract it and need one fewer square, keeping k) or never use it again (move to k + 1); or combines the two. Blank (a) can stop early when all n remaining squares are k*k; total == 0 and n == 0 also works but takes more calls. Blank (b) stops once even one square of size k*k is too big.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "squares",
+    "header": "Q4(b) \u00a0squares Fall 2023 MT2 Q4(b) \u00b7 adapted: the exam's generator now returns a list of lists",
+    "text": [
+     "Implement squares, which takes positive integers total and k. It returns a list of all lists of perfect squares",
+     "greater or equal to k*k that sum to total.",
+     ""
+    ],
+    "signature": "def squares(total, k):\n    \"\"\"Return the ways in which perfect squares greater or equal to k*k sum to total.\n    >>> squares(10, 1) # All lists of perfect squares that sum to 10\n    [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1], [4, 1, 1, 1, 1, 1, 1], [4, 4, 1, 1], [9, 1]]\n    >>> squares(20, 2) # Only use perfect squares greater or equal to 4 (2*2).\n    [[4, 4, 4, 4, 4], [16, 4]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def squares(total, k):\n    assert total > 0 and k > 0\n    if total == k * k:\n        return [[k * k]]\n    elif total > k * k:\n        return [s + [k * k] for s in squares(total - k * k, k)] + squares(total, k + 1)\n    else:\n        return []",
+    "explanation": "Each list from squares(total - k * k, k) sums to total - k*k and uses squares no smaller than k*k, so adding one more k*k at the end gives a non-increasing list summing to total. Blank (a) is a list holding one list, [[k * k]]. Note s + [k * k], not s + k * k (list plus int is an error) and not s.append(...) (returns None).",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)(iv)",
+    "title": "shortest list of squares",
+    "header": "Q4(b)(iv) \u00a0shortest list of squares Fall 2023 MT2 Q4(b)(iv) \u00b7 adapted: uses the list version of squares",
+    "text": [
+     "Write an expression containing a that evaluates to the shortest list of perfect squares that sum to an integer a.",
+     "For example, if a = 32, it should evaluate to [16, 16] (not [25, 4, 1, 1, 1]). If two or more lists are both",
+     "shortest, it can evaluate to any of them. Assume squares is implemented correctly.",
+     ""
+    ],
+    "signature": "def shortest(a):\n    \"\"\"Return a shortest list of perfect squares that sum to a.\n    >>> shortest(32)\n    [16, 16]\n    \"\"\"",
+    "given": "",
+    "provided": "squares(total, k) from the previous part is predefined and returns a list of lists.",
+    "solution": "def shortest(a):\n    return min(squares(a, 1), key=len)",
+    "explanation": "squares(a, 1) lists every way to write a; min with key=len compares the lists by length instead of lexicographically. Without the key, min would return the list that is smallest element by element, which is the all-ones list. ",
+    "sol_uses": "Uses code provided by the exam: squares(total, k) from the previous part is predefined and returns a list of lists."
+   },
+   {
+    "qnum": "Q6(a), (b)",
+    "title": "after",
+    "header": "Q6(a), (b) \u00a0after Fall 2023 MT2 Q6(a), (b) \u00b7 notation: Link.empty is now ()",
+    "text": [
+     "Implement after, which takes a linked list s and values a and b. It returns whether an element of s equal to",
+     "b appears after an element of s equal to a.",
+     ""
+    ],
+    "signature": "def after(s, a, b):\n    \"\"\"Return whether b comes after a in linked list s.\n    >>> t = Link(3, Link(6, Link(5, Link(4))))\n    >>> after(t, 6, 4)\n    True\n    >>> after(t, 4, 6)\n    False\n    >>> after(t, 6, 6)\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def after(s, a, b):\n    def find(s, n, f):\n        if s == ():\n            return False\n        elif s.first == n:\n            return f(s.rest)\n        else:\n            return find(s.rest, n, f)\n    return find(s, a, lambda rest: find(rest, b, lambda rest: True))",
+    "explanation": "find walks the list looking for n and, once found, hands the rest of the list to f. Reaching the end without finding it means False. The outer search finds a; its f starts a second search for b in what follows, and that search's f just returns True because finding b is all that matters.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "fa24",
+  "term": "Fall 2024",
+  "questions": [
+   {
+    "qnum": "Q4(a)",
+    "title": "semiperfect",
+    "header": "Q4(a) \u00a0semiperfect Fall 2024 MT2 Q4(a)",
+    "text": [
+     "A proper divisor of n is a d < n that divides n evenly. A positive integer is semiperfect if it equals the sum of",
+     "some (or all) of its distinct proper divisors, e.g. 24 = 2 + 4 + 6 + 12. Implement semiperfect.",
+     ""
+    ],
+    "signature": "def semiperfect(n):\n    \"\"\"Return whether positive integer n is a sum of some (or all) of its proper divisors.\n    >>> [k for k in range(1, 40) if semiperfect(k)]\n    [6, 12, 18, 20, 24, 28, 30, 36]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def semiperfect(n):\n    def f(s, d):\n        if s == 0:\n            return True\n        if d >= n:\n            return False\n        if n % d == 0 and f(s - d, d + 1):\n            return True\n        return f(s, d + 1)\n    return f(n, 1)",
+    "explanation": "s is the amount still to be made and d is the next candidate divisor. Reaching exactly 0 means a valid set of divisors was found. If d divides n, try using it (subtract it and move on); either way also try skipping it. Moving to d + 1 in both branches stops any divisor from being used twice.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "subsums",
+    "header": "Q4(b) \u00a0subsums Fall 2024 MT2 Q4(b) \u00b7 adapted: the generator (yield / yield from) now returns a list",
+    "text": [
+     "Implement subsums, which takes a list of unique positive integers s and a positive integer n and returns a list",
+     "of all sublists of s (elements kept in order) that sum to n, with no list appearing twice. On the exam this was",
+     "a generator; here it returns a list in the same order the generator would yield.",
+     ""
+    ],
+    "signature": "def subsums(s, n):\n    \"\"\"Return a list of all sublists of s that sum to n.\n    >>> subsums([1, 2, 3, 6, 9], 18)\n    [[1, 2, 6, 9], [3, 6, 9]]\n    >>> subsums([1, 2, 3, 4, 6], 16)\n    [[1, 2, 3, 4, 6]]\n    >>> subsums([1, 2, 3, 4, 6, 8, 12], 12)\n    [[1, 2, 3, 6], [1, 3, 8], [2, 4, 6], [4, 8], [12]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def subsums(s, n):\n    if not s:\n        return []\n    if n == s[0]:\n        found = [[n]]\n    else:\n        found = []\n    return found + [s[:1] + t for t in subsums(s[1:], n - s[0])] + subsums(s[1:], n)",
+    "explanation": "Every sublist either uses s[0] or does not. If it does, either s[0] alone is n, or s[0] goes in front of a sublist of the rest that sums to n - s[0]. If it does not, it is a sublist of s[1:] summing to n. s[:1] + t puts the first element in front as a one-element list, whereas [s] + t would nest the whole list.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(c)",
+    "title": "semisums",
+    "header": "Q4(c) \u00a0semisums Fall 2024 MT2 Q4(c) blanks (i) to (k) \u00b7 adapted: relies on the list-returning subsums from part (b)",
+    "text": [
+     "Implement semisums, which takes a positive integer n and returns a list of all lists of distinct proper divisors",
+     "of n that sum to n. You may call semiperfect and subsums.",
+     ""
+    ],
+    "signature": "def semisums(n):\n    \"\"\"Return a list of all lists (with no repeats) of\n    proper divisors of n that sum to n.\n    >>> semisums(22) # 22 is not semiperfect, so there are no sums.\n    []\n    >>> semisums(30) # 30 is semiperfect. It has three different sums.\n    [[1, 3, 5, 6, 15], [2, 3, 10, 15], [5, 10, 15]]\n    \"\"\"",
+    "given": "",
+    "provided": "subsums(s, n) (returns a list of the sublists of s that sum to n) and semiperfect(n) are predefined.",
+    "solution": "def semisums(n):\n    return list(subsums([k for k in range(1, n) if n % k == 0], n))",
+    "explanation": "The comprehension lists the proper divisors of n in increasing order. Passing them to subsums with target n finds every way to pick distinct divisors adding to n. Filtering with semiperfect(k) would be wrong: the question is whether k divides n, not whether k is semiperfect. ",
+    "sol_uses": "Uses code provided by the exam: subsums(s, n) (returns a list of the sublists of s that sum to n) and semiperfect(n) are predefined."
+   },
+   {
+    "qnum": "Q4(c) blank (l)",
+    "title": "primitive_semiperfect",
+    "header": "Q4(c) blank (l) \u00a0primitive_semiperfect Fall 2024 MT2 Q4(c) blank (l) \u00b7 adapted: map and filter replaced by a list",
+    "text": [
+     "comprehension",
+     "Implement primitive_semiperfect, which returns True if n is semiperfect and no smaller semiperfect",
+     "number divides it. semiperfect from part (a) is available.",
+     ""
+    ],
+    "signature": "def primitive_semiperfect(n):\n    \"\"\"Return whether n is semiperfect and has no semiperfect proper divisors.\n    >>> [k for k in range(1, 300) if primitive_semiperfect(k)]\n    [6, 20, 28, 88, 104, 272]\n    \"\"\"",
+    "given": "",
+    "provided": "semiperfect(n) from part (a) is predefined.",
+    "solution": "def primitive_semiperfect(n):\n    return semiperfect(n) and not any([semiperfect(k) for k in range(1, n) if n % k == 0])",
+    "explanation": "The comprehension walks over the candidates 1 to n - 1, keeps the ones that divide n (its proper divisors) and turns each into True or False with semiperfect. not any(...) then checks that none of them is semiperfect.",
+    "sol_uses": "comprehension Uses code provided by the exam: semiperfect(n) from part (a) is predefined."
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "longer",
+    "header": "Q5(a) \u00a0longer Fall 2024 MT2 Q5(a) \u00b7 adapted: Link.empty written as (), doctests use print",
+    "text": [
+     "Implement longer, which takes two linked lists s and t and returns the longer one, or s if they are the same",
+     "length.",
+     ""
+    ],
+    "signature": "def longer(s, t):\n    \"\"\"Return the longer linked list, s or t. (Same length? return s.)\n    >>> print(longer(Link(2, Link(3)), ()))\n    (2 3)\n    >>> print(longer(Link(2, Link(3)), Link(4, Link(5))))\n    (2 3)\n    >>> print(longer(Link(2, Link(3)), Link(4, Link(5, Link(6, Link(7))))))\n    (4 5 6 7)\n    >>> longer((), ()) == ()\n    True\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def longer(s, t):\n    a, b = s, t\n    while b != ():\n        if a == ():\n            return t\n        a, b = a.rest, b.rest\n    return s",
+    "explanation": "Walk down both lists together with a and b, keeping s and t unchanged so they can be returned. If a runs out while b still has elements, t is longer. If b runs out first or at the same time, return s. Both pointers must advance in the same step, which is why the assignment is simultaneous.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(b)",
+    "title": "longest (linked list)",
+    "header": "Q5(b) \u00a0longest (linked list) Fall 2024 MT2 Q5(b) \u00b7 adapted: Link.empty written as (), doctests use print",
+    "text": [
+     "Implement longest, which takes a linked list of positive integers s and a positive integer n and returns the",
+     "longest sublist of s (elements kept in order) whose sum is at most n. Do not mutate s. The empty linked list",
+     "sums to 0. Assume longer from part (a) works.",
+     ""
+    ],
+    "signature": "def longest(s, n):\n    \"\"\"Return the longest sublist of s that sums to n or less.\n    >>> print(longest(Link(5, Link(1, Link(3, Link(4, Link(2, Link(7)))))), 7))\n    (1 3 2)\n    >>> print(longest(Link(5, Link(1, Link(3, Link(4, Link(2, Link(7)))))), 70))\n    (5 1 3 4 2 7)\n    >>> longest(Link(3, Link(4, Link(5))), 2) == ()\n    True\n    \"\"\"",
+    "given": "",
+    "provided": "longer(s, t) from part (a) is predefined: it returns the longer linked list, or s on a tie.",
+    "solution": "def longest(s, n):\n    if s == ():\n        return s\n    t = longest(s.rest, n)\n    if s.first <= n:\n        return longer(Link(s.first, longest(s.rest, n - s.first)), t)\n    else:\n        return t",
+    "explanation": "t is the best answer that skips s.first. If s.first fits in the budget, the best answer that uses it is a new Link holding s.first in front of the best sublist of the rest with the budget reduced by s.first. longer picks whichever of the two options is longer, and nothing in s is changed.",
+    "sol_uses": "Uses code provided by the exam: longer(s, t) from part (a) is predefined: it returns the longer linked list, or s on a tie."
+   }
+  ]
+ },
+ {
+  "id": "fa25",
+  "term": "Fall 2025",
+  "questions": [
+   {
+    "qnum": "Q4(a)",
+    "title": "exclude",
+    "header": "Q4(a) \u00a0exclude Fall 2025 MT2 Q4(a)",
+    "text": [
+     "Implement exclude, which takes a list of numbers s and a number x and returns a list of all elements of s",
+     "that are not equal to x. Do not modify s; s may be empty.",
+     ""
+    ],
+    "signature": "def exclude(s, x):\n    \"\"\"Return a list with all of the elements of s except those equal to x.\n    >>> a = [3, 4, 5, 3.0, 6, 5, 3]\n    >>> exclude(a, 3)\n    [4, 5, 6, 5]\n    >>> a # no change to a\n    [3, 4, 5, 3.0, 6, 5, 3]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def exclude(s, x):\n    return [y for y in s if y != x]",
+    "explanation": "A list comprehension with an if filter builds a brand new list, so s is untouched. Note that 3.0 == 3 is True in Python, which is why 3.0 is also removed.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "exclude_link",
+    "header": "Q4(b) \u00a0exclude_link Fall 2025 MT2 Q4(b) \u00b7 adapted: Link.empty written as (), doctests use print",
+    "text": [
+     "Implement exclude_link, which takes a linked list of numbers s and a number x and returns a linked list of",
+     "all elements of s that are not equal to x. Do not modify s; it may be empty.",
+     ""
+    ],
+    "signature": "def exclude_link(s, x):\n    \"\"\"Return a linked list with all of the elements of linked list s except those equal to x.\n    >>> a = Link(3, Link(4, Link(5, Link(3.0, Link(6, Link(5, Link(3)))))))\n    >>> print(exclude_link(a, 3))\n    (4 5 6 5)\n    >>> print(a) # no change to a\n    (3 4 5 3.0 6 5 3)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def exclude_link(s, x):\n    if s == ():\n        return s\n    elif s.first == x:\n        return exclude_link(s.rest, x)\n    else:\n        return Link(s.first, exclude_link(s.rest, x))",
+    "explanation": "The empty linked list has nothing to remove, so return it. If the first element equals x, skip it by returning the result for the rest; otherwise build a new Link whose first is kept and whose rest is the filtered remainder. No existing Link is changed.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6(a)",
+    "title": "symmetrical",
+    "header": "Q6(a) \u00a0symmetrical Fall 2025 MT2 Q6(a) \u00b7 d.keys() written as d (iterating over a dictionary gives its keys)",
+    "text": [
+     "Implement symmetrical, which takes a dictionary d and returns True if for every pair (k, v) with d[k] == v",
+     "it is also true that d[v] == k. Assume None is not a key or value. d.get(key) returns None when the key is",
+     "missing.",
+     ""
+    ],
+    "signature": "def symmetrical(d):\n    \"\"\"Return whether every key-value pair in d is also a value-key pair.\n    >>> symmetrical({'M': 'P', 'P': 'M', 'G': 'G'})\n    True\n    >>> symmetrical({'M': 'P', 'P': 'M', 'G': 'M'}) # No M->G\n    False\n    >>> symmetrical({'M': 'P', 'P': 'M', 'G': 'T'}) # No T->G\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def symmetrical(d):\n    return all([d.get(d[k]) == k for k in d])",
+    "explanation": "For each key k, its value is d[k]; looking that value up again must lead back to k. Using get instead of square brackets avoids a KeyError when the value is not a key (it gives None, which never equals k). ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6(b)",
+    "title": "acceptable",
+    "header": "Q6(b) \u00a0acceptable Fall 2025 MT2 Q6(b)",
+    "text": [
+     "A pizza is a string of M, P and _ slices; adjacent slices (including the first and last, since a pizza is round) must",
+     "not form a pair in the symmetrical dictionary disallow. Implement acceptable.",
+     ""
+    ],
+    "signature": "def acceptable(pizza, disallow={'M': 'P', 'P': 'M'}):\n    \"\"\"Return whether there are no slices next to each other with a disallowed topping pair.\n    >>> acceptable(\"MM_PPP__M\")\n    True\n    >>> acceptable(\"MM__PPP\") # The first slice M and last slice P are next to each other.\n    False\n    >>> acceptable(\"MM__PPP_\")\n    True\n    >>> acceptable(\"MM__MPPP_\")\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "symmetrical from part (a) is predefined.",
+    "solution": "def acceptable(pizza, disallow={'M': 'P', 'P': 'M'}):\n    assert symmetrical(disallow)\n    previous = ''\n    for slice in pizza:\n        if previous and disallow.get(previous) == slice:\n            return False\n        previous = slice\n    return disallow.get(slice) != pizza[0]",
+    "explanation": "The loop remembers the previous slice and fails as soon as a slice is the disallowed partner of the one before it; previous and ... skips the check for the very first slice, when previous is still the empty string. After the loop slice holds the last slice, so the final line checks the wrap-around pair of last and first slices.",
+    "sol_uses": "Uses code provided by the exam: symmetrical from part (a) is predefined."
+   },
+   {
+    "qnum": "Q6(c)",
+    "title": "count_pizzas",
+    "header": "Q6(c) \u00a0count_pizzas Fall 2025 MT2 Q6(c) \u00b7 adapted: the allowed_next.remove(...) lines rewritten as list comprehensions (no",
+    "text": [
+     "mutation)",
+     "Implement count_pizzas, which takes a positive integer num_slices and returns the number of different",
+     "pizzas made of M, P and _ slices with no M next to a P (the first and last slices are next to each other). You may",
+     "not call acceptable. In f, n slices are placed so far, first is the first slice and previous the most recent one.",
+     "",
+     ""
+    ],
+    "signature": "def count_pizzas(num_slices):\n    \"\"\"Return the number of ways to top a pizza with num_slices.\n    >>> count_pizzas(1) # One slice can have mushroom, or pineapple, or no topping.\n    3\n    >>> count_pizzas(2) # MM M_ _M __ PP P_ _P\n    7\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def count_pizzas(num_slices):\n    def f(n, first, previous):\n        if n == num_slices:\n            if first == previous or '_' in [first, previous]:\n                return 1\n            return 0\n        allowed_next = list(slice_types)\n        if previous == 'P':\n            allowed_next = [x for x in allowed_next if x != 'M']\n        if previous == 'M':\n            allowed_next = [x for x in allowed_next if x != 'P']\n        return sum([f(n + 1, first, x) for x in allowed_next])\n    slice_types = ['_', 'M', 'P']\n    return sum([f(1, x, x) for x in slice_types])",
+    "explanation": "When all slices are placed, the pizza still has to pass the wrap-around check: the last slice sits next to the first, which is fine if they match or either is plain. Otherwise, each slice that may follow previous is tried by recursing with one more slice placed and x as the new previous slice, and the counts are summed. On the exam list(slice_types) mattered because remove mutated the list; with the comprehension version a copy is no longer needed. ",
+    "sol_uses": "mutation)"
+   },
+   {
+    "qnum": "Q6(d)",
+    "title": "pizzas",
+    "header": "Q6(d) \u00a0pizzas Fall 2025 MT2 Q6(d) \u00b7 adapted: blank (k) (ways.extend) replaced by ways = ways + [...] (no mutation) \u00b7 filter",
+    "text": [
+     "replaced by a list comprehension",
+     "Implement pizzas, which takes a positive integer n and returns a list of all pizzas of n slices (M, P or _) with",
+     "no M next to a P. check_ends says whether to also check that the first and last slices may be next to each",
+     "other. You may not call acceptable. The last line keeps only the pizzas for which ok returns a true value.",
+     ""
+    ],
+    "signature": "def pizzas(n, check_ends=True):\n    \"\"\"Ways to distribute M and P toppings on a pizza with n slices.\n    >>> pizzas(1)\n    ['_', 'M', 'P']\n    >>> pizzas(2)\n    ['__', '_M', '_P', 'M_', 'MM', 'P_', 'PP']\n    >>> pizzas(3)\n    ['___', '__M', '__P', '_M_', '_MM', '_P_', '_PP', 'M__', 'M_M', 'MM_', 'MMM', 'P__', 'P_P', 'PP_', 'PPP']\n    >>> '_M_P' in pizzas(4)\n    True\n    >>> [pizzas(8)[i*90] for i in range(1, 7)]  # A few examples from pizzas(8)\n    ['___PP_M_', '__P__MMM', '_M__P__P', '_MM_M_P_', '_P_M___M', '_PP_P_MM']\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def pizzas(n, check_ends=True):\n    if n == 0:\n        return [\"\"]\n    recurse = pizzas(n-1, False)\n    ways = ['_' + x for x in recurse]\n    for y, z in [['M', 'P'], ['P', 'M']]:\n        ways = ways + [y + x for x in recurse if not x or x[0] != z]\n    ok = lambda x: True\n    if check_ends:\n        ok = lambda x: x[0] + x[-1] not in ['MP', 'PM']\n    return [x for x in ways if ok(x)]",
+    "explanation": "The base case is a list holding one empty pizza, so that one-slice pizzas can be built by adding a slice in front of it. A plain slice can go in front of any shorter pizza, while topping y can go in front only when the shorter pizza is empty or does not start with the clashing topping z. The recursive call passes False because the wrap-around check only makes sense on the finished pizza, which [x for x in ways if ok(x)] applies at the top level.",
+    "sol_uses": "replaced by a list comprehension"
+   }
+  ]
+ },
+ {
+  "id": "sp15",
+  "term": "Spring 2015",
+  "questions": [
+   {
+    "qnum": "Q3(d)",
+    "title": "double_up",
+    "header": "Q3(d) \u00a0double_up Spring 2015 MT2 Q3(d) \u00b7 adapted: returns a new linked list instead of mutating s and returning the number",
+    "text": [
+     "of insertions; solution written by us (no official solution)",
+     "Implement double_up, which takes a linked list s and returns a new linked list with elements inserted so that",
+     "each element is adjacent to an equal element, inserting as few elements as possible (assume no value appears",
+     "three or more times in a row). (The exam version mutated s and returned the number of insertions.)",
+     ""
+    ],
+    "signature": "def double_up(s):\n    \"\"\"Return a new linked list with elements inserted so that each element is next to an equal.\n    >>> s = Link(3, Link(4))\n    >>> print(double_up(s))  # Inserts 3 and 4\n    (3 3 4 4)\n    >>> t = Link(3, Link(4, Link(4, Link(5))))\n    >>> print(double_up(t))  # Inserts 3 and 5\n    (3 3 4 4 5 5)\n    >>> u = Link(3, Link(4, Link(3)))\n    >>> print(double_up(u))  # Inserts 3, 4, and 3\n    (3 3 4 4 3 3)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def double_up(s):\n    if s == ():\n        return ()\n    elif s.rest == ():\n        return Link(s.first, Link(s.first))\n    elif s.first == s.rest.first:\n        return Link(s.first, Link(s.first, double_up(s.rest.rest)))\n    else:\n        return Link(s.first, Link(s.first, double_up(s.rest)))",
+    "explanation": "A lone last element needs a copy. If the first two elements are already equal, they form a pair, so keep both and skip past them with s.rest.rest. Otherwise the first element has no partner: emit it twice and continue from s.rest.",
+    "sol_uses": "of insertions; solution written by us (no official solution)"
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "decrypt",
+    "header": "Q4(b) \u00a0decrypt Spring 2015 MT2 Q4(b) \u00b7 adapted: ms.append(x) replaced by ms = ms + [x]; solution written by us (no",
+    "text": [
+     "official solution)",
+     "Implement decrypt, which takes a string s and a dictionary d that has secret codes as keys and words as",
+     "values. It returns a list of all possible ways in which s can be decoded by splitting it into secret codes and",
+     "separating the corresponding words by spaces. (The exam used ms.append(...); here the list is grown with",
+     "+.)",
+     "",
+     ""
+    ],
+    "signature": "def decrypt(s, d):\n    \"\"\"List all possible decoded strings of s.\n    >>> codes = {\n    ...     'alan': 'spooky',\n    ...     'al': 'drink',\n    ...     'antu': 'your',\n    ...     'turing': 'ghosts',\n    ...     'tur': 'scary',\n    ...     'ing': 'skeletons',\n    ...     'ring': 'ovaltine'\n    ... }\n    >>> decrypt('alanturing', codes)\n    ['drink your ovaltine', 'spooky ghosts', 'spooky scary skeletons']\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def decrypt(s, d):\n    if s == '':\n        return []\n    ms = []\n    if s in d:\n        ms = ms + [d[s]]\n    for k in range(1, len(s)):\n        first, suffix = s[:k], s[k:]\n        if first in d:\n            for rest in decrypt(suffix, d):\n                ms = ms + [d[first] + ' ' + rest]\n    return ms",
+    "explanation": "The whole string may itself be a code, which gives a one-word decoding. Otherwise try every split point k that leaves a non-empty suffix: if the prefix is a code, every decoding of the suffix (from the recursive call) gets that word and a space on the front. Since decrypt('') is [], the whole-string case must be handled separately.",
+    "sol_uses": "official solution)"
+   }
+  ]
+ },
+ {
+  "id": "sp16",
+  "term": "Spring 2016",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "double1",
+    "header": "Q3(a) \u00a0double1 Spring 2016 MT2 Q3(a) \u00b7 adapted: written recursively, since the exam's iterative version needed last.rest = ...",
+    "text": [
+     "mutation",
+     "Implement double1, which takes a linked list L and returns a new linked list in which each item of L is",
+     "repeated immediately after that item. It is non-destructive: L must not change. (The exam required an",
+     "iterative solution that mutated a tail pointer; write it recursively instead.)",
+     ""
+    ],
+    "signature": "def double1(L):\n    \"\"\"Returns a list in which each item in L appears twice in sequence.\n    It is non-destructive.\n    >>> Q = Link(3, Link(4, Link(1)))\n    >>> print(double1(Q))\n    (3 3 4 4 1 1)\n    >>> print(Q)\n    (3 4 1)\n    >>> double1(())\n    ()\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def double1(L):\n    if L == ():\n        return ()\n    return Link(L.first, Link(L.first, double1(L.rest)))",
+    "explanation": "The empty list doubles to the empty list. Otherwise the result starts with two copies of L.first in front of the doubled rest; every Link is new, so L is untouched.",
+    "sol_uses": "mutation"
+   }
+  ]
+ },
+ {
+  "id": "sp18",
+  "term": "Spring 2018",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "column",
+    "header": "Q3(a) \u00a0column Spring 2018 MT2 Q3(a)",
+    "text": [
+     "A grid is a list of lists (rows) that all have the same length. Implement column, which takes a grid g and a",
+     "non-negative integer c smaller than the length of a row. It returns a list containing the element at index c of",
+     "each row.",
+     ""
+    ],
+    "signature": "def column(g, c):\n    \"\"\"Return the column of g at index c.\n    >>> column([[3, 4, 5], [6, 7, 8], [9, 10, 11]], 1)\n    [4, 7, 10]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def column(g, c):\n    return [row[c] for row in g]",
+    "explanation": "Each row is a list, so row[c] picks the element in column c. A comprehension over the rows collects one element per row, top to bottom.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "print_grid",
+    "header": "Q3(b) \u00a0print_grid Spring 2018 MT2 Q3(b)",
+    "text": [
+     "Implement print_grid, which takes a grid g (with at least one row). It prints one line per row. Each line",
+     "displays the elements of that row, separated by the minimum number of spaces needed to align the left edges",
+     "of the str strings in each column. At least one space must appear between any two elements; extra spaces at",
+     "the end of a line are fine. You may not use column.",
+     ""
+    ],
+    "signature": "def print_grid(g):\n    \"\"\"Print each row on a separate line with columns aligned.\n    >>> print_grid([[1, 234, 50, 4, 5], [67, 8, 90, 0, 500], [3, 4, 5, -500, 7]])\n    1  234 50 4    5\n    67 8   90 0    500\n    3  4   5  -500 7\n    \"\"\"",
+    "given": "",
+    "provided": "The tests call print_grid_trimmed(g), which runs your print_grid and strips trailing spaces from each line (the exam allows extra spaces at the end of a line).",
+    "solution": "def print_grid(g):\n    cs = range(len(g[0]))\n    widths = [max([len(str(row[c])) for row in g]) for c in cs]\n    for row in g:\n        line = ''\n        for c in cs:\n            s = str(row[c])\n            line = line + s + ' ' * (widths[c] - len(s) + 1)\n        print(line)",
+    "explanation": "First compute, for each column index c, the widest str in that column with max over a comprehension of lengths. Then each element is followed by enough spaces to reach that width plus one separating space: widths[c] - len(s) + 1.",
+    "sol_uses": "Uses code provided by the exam: The tests call print_grid_trimmed(g), which runs your print_grid and strips trailing spaces from each line (the exam allows extra spaces at the end of a line)."
+   },
+   {
+    "qnum": "Q3(c)",
+    "title": "expand",
+    "header": "Q3(c) \u00a0expand Spring 2018 MT2 Q3(c) \u00b7 adapted: returns a new grid instead of mutating g with extend/append",
+    "text": [
+     "Implement expand, which takes a grid g, a number of rows h, a number of columns w and a fill value. It",
+     "returns a new grid containing the rows of g, expanded so that it has at least h rows and w columns. Any added",
+     "values are fill. (The exam version mutated g; here g must not change.)",
+     ""
+    ],
+    "signature": "def expand(g, h, w, fill):\n    \"\"\"Return grid g expanded so that it has at least h rows and w columns.\n    >>> g = [[1, 2, 3], [40, 50, 60]]\n    >>> g2 = expand(g, 2, 5, 10)\n    >>> g2\n    [[1, 2, 3, 10, 10], [40, 50, 60, 10, 10]]\n    >>> g3 = expand(g2, 5, 6, 0)\n    >>> g3\n    [[1, 2, 3, 10, 10, 0], [40, 50, 60, 10, 10, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]\n    >>> expand(g3, 0, 0, 5) == g3\n    True\n    >>> g\n    [[1, 2, 3], [40, 50, 60]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def expand(g, h, w, fill):\n    result = [row + [fill] * (w - len(row)) for row in g]\n    for k in range(h - len(g)):\n        result = result + [[fill] * w]\n    return result",
+    "explanation": "Multiplying a list by a negative number gives [], so [fill] * (w - len(row)) pads short rows and leaves long ones alone; likewise range of a negative number is empty. Each missing row is a fresh list [fill] * w, added with + rather than append. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(a)",
+    "title": "stretch",
+    "header": "Q4(a) \u00a0stretch Spring 2018 MT2 Q4(a) \u00b7 adapted: returns a new linked list instead of mutating s.rest",
+    "text": [
+     "Implement stretch, which takes a linked list s. It returns a new linked list in which, for each position k",
+     "(counting from 1) in s, the kth element is repeated k times. The repeat parameter counts how many extra",
+     "copies the current element needs. (The exam version mutated s.)",
+     ""
+    ],
+    "signature": "def stretch(s, repeat=0):\n    \"\"\"Replicate the kth element k times, for all k in s.\n    >>> a = Link(3, Link(4, Link(5, Link(6))))\n    >>> print(stretch(a))\n    (3 4 4 5 5 5 6 6 6 6)\n    >>> print(a)\n    (3 4 5 6)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def stretch(s, repeat=0):\n    if s == ():\n        return ()\n    result = Link(s.first, stretch(s.rest, repeat + 1))\n    for i in range(repeat):\n        result = Link(s.first, result)\n    return result",
+    "explanation": "The extra parameter repeat remembers the position: the first element gets 0 extra copies, the next gets 1 and so on, so the recursive call passes repeat + 1. The loop then puts repeat more copies of s.first on the front of the result.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "combo",
+    "header": "Q4(b) \u00a0combo Spring 2018 MT2 Q4(b)",
+    "text": [
+     "Implement combo, which takes two non-negative integers a and b. It returns the smallest integer that contains",
+     "all of the digits of a in order, as well as all of the digits of b in order.",
+     ""
+    ],
+    "signature": "def combo(a, b):\n    \"\"\"Return the smallest integer with all of the digits of a and b (in order).\n    >>> combo(531, 432)    # 45312 contains both _531_ and 4_3_2.\n    45312\n    >>> combo(531, 4321)   # 45321 contains both _53_1 and 4_321.\n    45321\n    >>> combo(1234, 9123)  # 91234 contains both _1234 and 9123_.\n    91234\n    >>> combo(0, 321)      # The number 0 has no digits, so 0 is not in the result.\n    321\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def combo(a, b):\n    if min(a, b) == 0:\n        return a + b\n    elif a % 10 == b % 10:\n        return combo(a // 10, b // 10) * 10 + a % 10\n    return min(combo(a // 10, b) * 10 + a % 10,\n               combo(a, b // 10) * 10 + b % 10)",
+    "explanation": "Build the answer from its last digit. If one number has run out, the other is the answer. If both last digits match, one shared digit serves both, so recurse on both shortened numbers and put that digit back with * 10 + a % 10. Otherwise the last digit comes from a or from b: try both and keep the min.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "sp19",
+  "term": "Spring 2019",
+  "questions": [
+   {
+    "qnum": "Q3",
+    "title": "in_nested",
+    "header": "Q3 \u00a0in_nested Spring 2019 MT2 Q3",
+    "text": [
+     "Implement in_nested, which takes a value v and either a nested list or an individual value L, and returns",
+     "whether v is contained in L. The built-in type returns the type of an object, so type([1]) == list.",
+     ""
+    ],
+    "signature": "def in_nested(v, L):\n    \"\"\"\n    >>> in_nested(5, [1, 2, [[3], 4]])\n    False\n    >>> in_nested(9, [[[1], [6, 4, [5, [9]]], 7], 7, 7])\n    True\n    >>> in_nested(1, 1)\n    True\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def in_nested(v, L):\n    if type(L) != list:\n        return L == v\n    else:\n        return any([in_nested(v, sub) for sub in L])",
+    "explanation": "A single value (not a list) contains v only if it equals v. A list contains v if any of its elements does, and each element may itself be a list, so the check recurses into each one. any of an empty list is False, which handles [] for free. (The official second solution, in_nested(v, L[0]) or in_nested(v, L[1:]), needs a different base case.)",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "sp20",
+  "term": "Spring 2020",
+  "questions": [
+   {
+    "qnum": "Q2(a)",
+    "title": "is_power",
+    "header": "Q2(a) \u00a0is_power Spring 2020 MT2 Q2(a)",
+    "text": [
+     "Implement is_power, which takes a positive integer base and a non-negative integer s, and returns whether",
+     "s is a power of base: whether there is a non-negative integer n with pow(base, n) == s. You may not call",
+     "pow, use ** or import anything. Your solution must be recursive.",
+     "",
+     ""
+    ],
+    "signature": "def is_power(base, s):\n    \"\"\"Return whether s is a power of base.\n    >>> is_power(5, 625)  # pow(5, 4) = 5 * 5 * 5 * 5 = 625\n    True\n    >>> is_power(5, 1)    # pow(5, 0) = 1\n    True\n    >>> is_power(5, 5)    # pow(5, 1) = 5\n    True\n    >>> is_power(5, 15)   # 15 is not a power of 5 (it's a multiple)\n    False\n    >>> is_power(3, 9)\n    True\n    >>> is_power(3, 8)\n    False\n    >>> is_power(3, 10)\n    False\n    >>> is_power(1, 8)\n    False\n    >>> is_power(2, 0)    # 0 is not a power of any positive base.\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def is_power(base, s):\n    assert base > 0 and s >= 0\n    assert type(base) is int and type(s) is int\n    if s == 1:\n        return True\n    elif base == 1 or s == 0 or s % base != 0:\n        return False\n    else:\n        return is_power(base, s // base)",
+    "explanation": "Every power of base is 1 times base some number of times, so 1 is the success case. Otherwise s must divide evenly by base, and then s // base must also be a power. Base 1 and s == 0 are failure cases that would otherwise recurse forever (1 divides everything, and 0 // base is 0 again).",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q2(b)",
+    "title": "powers",
+    "header": "Q2(b) \u00a0powers Spring 2020 MT2 Q2(b) \u00b7 adapted: the generators became functions returning lists (each yield adds an",
+    "text": [
+     "element), and filter became a list comprehension",
+     "Implement powers, which takes positive integers n and k and returns a list of all integers m that are powers of",
+     "k and whose digits appear in order in n. The helper build(seed) returns every non-negative integer whose",
+     "digits appear in order in seed (0 is included because it has no digits). The results may be in any order.",
+     "sorted(s) returns a new list of the items of s in increasing order.",
+     ""
+    ],
+    "signature": "def powers(n, k):\n    \"\"\"Return a list of all powers of k whose digits appear in order in n.\n    >>> sorted(powers(12345, 5))\n    [1, 5, 25, 125]\n    >>> sorted(powers(54321, 5))  # 25 and 125 are not in order\n    [1, 5]\n    >>> sorted(powers(2493, 3))\n    [3, 9, 243]\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: a working is_power(base, s) from part (a) and curry2 = lambda f: lambda x: lambda y: f(x, y).",
+    "solution": "def powers(n, k):\n    def build(seed):\n        if seed == 0:\n            return [0]\n        else:\n            result = []\n            for x in build(seed // 10):\n                result = result + [x, x * 10 + seed % 10]\n            return result\n    return [m for m in build(n) if curry2(is_power)(k)(m)]",
+    "explanation": "Include or exclude the last digit of seed: every number built from the other digits seed // 10 appears once without it (x) and once with it stuck on the end (x * 10 + seed % 10). Building from seed // 10 keeps the digits in their original order. curry2(is_power)(k) is the one-argument function that asks whether its input is a power of k, so the order of the arguments matters. ",
+    "sol_uses": "element), and filter became a list comprehension Uses code provided by the exam: Predefined: a working is_power(base, s) from part (a) and curry2 = lambda f: lambda x: lambda y: f(x, y)."
+   },
+   {
+    "qnum": "Q3(a)",
+    "title": "sum_link",
+    "header": "Q3(a) \u00a0sum_link Spring 2020 MT2 Q3(a) \u00b7 Link.empty written as ()",
+    "text": [
+     "Implement sum_link, which takes a linked list s and a one-argument function transform that returns a",
+     "number. It returns the sum of the results of calling transform on each element of s.",
+     ""
+    ],
+    "signature": "def sum_link(s, transform):\n    \"\"\"Sum the result of calling transform on each element of Link s.\n    >>> s = Link(3, Link(5, Link(7)))\n    >>> sum_link(s, lambda x: x)       # 3 + 5 + 7\n    15\n    >>> double = lambda x: 2 * x\n    >>> sum_link(s, double)            # double(3) + double(5) + double(7)\n    30\n    >>> sum_link((), double)\n    0\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def sum_link(s, transform):\n    if s == ():\n        return 0\n    else:\n        return transform(s.first) + sum_link(s.rest, transform)",
+    "explanation": "The empty list sums to 0. Otherwise transform the first element and add the sum for the rest, passing transform along unchanged in the recursive call.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "sp21",
+  "term": "Spring 2021",
+  "questions": [
+   {
+    "qnum": "Q4",
+    "title": "separate",
+    "header": "Q4 \u00a0separate Spring 2021 MT2 Q4 \u00b7 Link.empty written as (); blanks follow the exam's suggested structure",
+    "text": [
+     "Implement separate, which takes separator and a linked list lnk of numbers, and returns a new linked list",
+     "where any two consecutive repeated numbers in lnk are separated by a link with the value separator. Your",
+     "solution must be recursive and must not mutate lnk.",
+     "",
+     "",
+     ""
+    ],
+    "signature": "def separate(separator, lnk):\n    \"\"\"Returns a new linked list (using Link) that separates\n    any two consecutive repeated numbers in non-empty LNK\n    by inserting a Link with the value of SEPARATOR.\n    Case 1: Separates list that starts with pair\n    >>> separate(999, Link(1, Link(1)))\n    Link(first=1, rest=Link(first=999, rest=Link(first=1, rest=())))\n    Case 2: Separates list with overlapping pairs\n    >>> print(separate(999, Link(1, Link(1, Link(1)))))\n    (1 999 1 999 1)\n    Case 3: Doesn't mutate the input list\n    >>> link = Link(1, Link(1))\n    >>> print(separate(999, link))\n    (1 999 1)\n    >>> print(link)\n    (1 1)\n    Case 4: Only separates pairs, not non-pairs\n    >>> print(separate(-999, Link(2, Link(2, Link(4, Link(5))))))\n    (2 -999 2 4 5)\n    Case 5: Separates pairs at end of list\n    >>> print(separate(-1, Link(2, Link(3, Link(4, Link(4))))))\n    (2 3 4 -1 4)\n    Case 6: Returns same-valued list if no pairs found\n    >>> print(separate(999, Link(1, Link(2))))\n    (1 2)\n    Case 7: Handles single element lists correctly\n    >>> lnk = Link(1)\n    >>> lnk2 = separate(999, lnk)\n    >>> lnk\n    Link(first=1, rest=())\n    >>> lnk is not lnk2\n    True\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def separate(separator, lnk):\n    if lnk == ():\n        return ()\n    elif lnk.rest == ():\n        return Link(lnk.first)\n    elif lnk.first == lnk.rest.first:\n        return Link(lnk.first, Link(separator, separate(separator, lnk.rest)))\n    return Link(lnk.first, separate(separator, lnk.rest))",
+    "explanation": "Build a new list one link at a time. The one-element case must return a fresh Link(lnk.first) rather than lnk, which is what Case 7 checks. When the first two values match, put the separator between the first value and the separated rest; recursing on lnk.rest (not lnk.rest.rest) is what handles overlapping pairs like 1 1 1.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6(b)(c)",
+    "title": "calc_emissions and calc_max_source",
+    "header": "Q6(b)(c) \u00a0calc_emissions and calc_max_source Spring 2021 MT2 Q6 \u00b7 adapted: the EmissionsTracker methods",
+    "text": [
+     "became functions taking a list of sources, EmissionSource is a data",
+     "class, and the mutating add_sources part (a) was dropped",
+     "An EmissionSource has a name, a dictionary emissions from gas name to emissions per hour, and the",
+     "number of hours it has been running. Implement calc_emissions, which returns a list of (name, total",
+     "emissions of gas) tuples, one per source in order, and calc_max_source, which returns the tuple with the",
+     "largest total. Use source_emissions where it is reasonable to do so.",
+     "",
+     ""
+    ],
+    "signature": "def calc_emissions(sources, gas):\n    \"\"\"Returns a list of tuples where the first element is the name of\n    the emission source and the second element is the total amount of emissions\n    from that type of GAS.\n    >>> pp1 = make_source(\"Anthracite Coal\", 2602, 276, 40, hours=5)\n    >>> pp2 = make_source(\"Lignite Coal\", 1389, 156, 23, hours=6)\n    >>> calc_emissions([pp1, pp2], \"methane\")\n    [('Anthracite Coal', 1380), ('Lignite Coal', 936)]\n    \"\"\"\n\ndef calc_max_source(sources, gas):\n    \"\"\"Returns a tuple where the first element is the name of the emission source\n    with the highest emissions and the second element is the total amount\n    of emissions from that source for that type of GAS.\n    >>> pp1 = make_source(\"Anthracite Coal\", 2602, 276, 40, hours=5)\n    >>> pp2 = make_source(\"Lignite Coal\", 1389, 156, 23, hours=6)\n    >>> calc_max_source([pp1, pp2], \"methane\")\n    ('Anthracite Coal', 1380)\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: @dataclass EmissionSource(name, emissions, hours=0), make_source(name, co2, ch4, n2o, hours=0) which fills in the emissions dictionary, and source_emissions(source, gas), which returns source.emissions.get(gas, 0) * source.hours (the exam's calc_emissions method).",
+    "solution": "def calc_emissions(sources, gas):\n    return [(source.name, source_emissions(source, gas)) for source in sources]\ndef calc_max_source(sources, gas):\n    return max(calc_emissions(sources, gas), key=lambda tup: tup[1])",
+    "explanation": "calc_emissions is one list comprehension that pairs each source's name with its total for that gas. calc_max_source reuses it and asks max to compare tuples by their second element; without the key, max would compare names alphabetically first. ",
+    "sol_uses": "became functions taking a list of sources, EmissionSource is a data class, and the mutating add_sources part (a) was dropped Uses code provided by the exam: Predefined: @dataclass EmissionSource(name, emissions, hours=0), make_source(name, co2, ch4, n2o, hours=0) which fills in the emissions dictionary, and source_emissions(source, gas), which returns source.emissions.get(gas, 0) * source.hours (the exam's calc_emissions method)."
+   },
+   {
+    "qnum": "Q7",
+    "title": "PaperReam",
+    "header": "Q7 \u00a0PaperReam Spring 2021 MT2 Q7 \u00b7 adapted: PaperReam is a data class and you write __str__ (the exam asked for __repr__)",
+    "text": [
+     "PaperReam is a data class with a color_name and a num_sheets.",
+     ""
+    ],
+    "signature": "@dataclass\nclass PaperReam:\n    \"\"\"\n    >>> ream = PaperReam(\"red\", 200)\n    >>> ream.color_name\n    'red'\n    >>> ream.num_sheets\n    200\n    >>> print(ream)\n    PaperReam('red', 200)\n    \"\"\"\n    color_name: str\n    num_sheets: int",
+    "given": "",
+    "provided": "",
+    "solution": "@dataclass\nclass PaperReam:\n    color_name: str\n    num_sheets: int\n    def __str__(self):\n        return f\"PaperReam({repr(self.color_name)}, {repr(self.num_sheets)})\"",
+    "explanation": "print calls str, which uses __str__, so the header is def __str__(self):. Calling repr on the colour adds the quotes around red; a plain {self.color_name} would print PaperReam(red, 200).",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "sp22",
+  "term": "Spring 2022",
+  "questions": [
+   {
+    "qnum": "Q1(c)",
+    "title": "flatten (debugging)",
+    "header": "Q1(c) \u00a0flatten (debugging) Spring 2022 MT2 Q1(c) \u00b7 adapted: res += [el] is written res = res + [el] to",
+    "text": [
+     "avoid mutation",
+     "Amritansh's flatten used line 5 res += [res.extend(flatten(el))], so flatten([\"Mialy\", [\"Daphne\",",
+     "\"Jordan\"]]) returned ['Mialy', 'Daphne', 'Jordan', None]. Rewrite the buggy line so flatten returns a",
+     "flat list of the non-list elements, in order.",
+     ""
+    ],
+    "signature": "def flatten(lst):\n    \"\"\"\n    >>> my_data = [\"Mialy\", [\"Daphne\", \"Jordan\"]]\n    >>> flatten(my_data)\n    ['Mialy', 'Daphne', 'Jordan']\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def flatten(lst):\n    res = []\n    for el in lst:\n        if isinstance(el, list):\n            res = res + flatten(el)\n        else:\n            res = res + [el]\n    return res",
+    "explanation": "flatten(el) is already a flat list, so concatenate it directly. The bug wrapped the return value of extend (always None) in a list and added it. A single element needs brackets ([el]); a recursive result does not.",
+    "sol_uses": "avoid mutation"
+   },
+   {
+    "qnum": "Q3",
+    "title": "DictionaryEntry",
+    "header": "Q3 \u00a0DictionaryEntry Spring 2022 MT2 Q3 \u00b7 adapted: a @dataclass, and only __str__ is written (writing your own __repr__",
+    "text": [
+     "comes after Lecture 14)",
+     "DictionaryEntry stores an English dictionary entry with attributes word and definition. Write __str__ so",
+     "that printing an entry, or putting it in an f-string, shows word: \"definition\". The @dataclass repr is",
+     "unchanged.",
+     ""
+    ],
+    "signature": "@dataclass\nclass DictionaryEntry:\n    \"\"\"\n    >>> euph = DictionaryEntry(\"euphoric\", \"intensely happy\")\n    >>> avid = DictionaryEntry(\"avid\", \"enthusiastic\")\n    >>> [euph, avid]\n    [DictionaryEntry(word='euphoric', definition='intensely happy'), DictionaryEntry(word='avid',definition='enthusiastic')]\n    >>> print(euph)\n    euphoric: \"intensely happy\"\n    >>> f'Today we are learning {euph}'\n    'Today we are learning euphoric: \"intensely happy\"'\n    \"\"\"\n    word: str\n    definition: str",
+    "given": "",
+    "provided": "",
+    "solution": "@dataclass\nclass DictionaryEntry:\n    word: str\n    definition: str\n    def __str__(self):\n        return f'{self.word}: \"{self.definition}\"'",
+    "explanation": "print and f-strings use __str__, so it builds the word: \"definition\" form with the double quotes as literal characters. A list still displays each element with the data class repr, which names every field.",
+    "sol_uses": "comes after Lecture 14)"
+   },
+   {
+    "qnum": "Q4",
+    "title": "make_necklace",
+    "header": "Q4 \u00a0make_necklace Spring 2022 MT2 Q4 \u00b7 notation: Link.empty is now (), displays updated",
+    "text": [
+     "Implement make_necklace, which creates a linked list whose values come from the list beads, repeating the",
+     "beads in order until the linked list has length elements.",
+     ""
+    ],
+    "signature": "def make_necklace(beads, length):\n    \"\"\"\n    Returns a linked list where each value is taken from the BEADS list,\n    repeating the values from the BEADS list until the linked list has reached\n    LENGTH. You can assume that LENGTH is greater than or equal to 1, there is\n    at least one bead in BEADS, and all beads are string values.\n    >>> wavy_ats = make_necklace([\"~\", \"@\"], 3)\n    >>> wavy_ats\n    Link(first='~', rest=Link(first='@', rest=Link(first='~', rest=())))\n    >>> print(wavy_ats)\n    (~ @ ~)\n    >>> wavy_ats2 = make_necklace([\"~\", \"@\"], 4)\n    >>> print(wavy_ats2)\n    (~ @ ~ @)\n    >>> curly_os = make_necklace([\"}\", \"O\", \"{\"], 9)\n    >>> print(curly_os)\n    (} O { } O { } O {)\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def make_necklace(beads, length):\n    if length == 0:\n        return ()\n    return Link(beads[0], make_necklace(beads[1:] + [beads[0]], length - 1))",
+    "explanation": "Use the first bead now, then rotate the list so that bead moves to the back: beads[1:] + [beads[0]]. The rotated list is a new list, so beads is never mutated. Each call adds one link, so length counts down to 0, where the empty linked list () ends it. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q8(c)",
+    "title": "get_scores_except",
+    "header": "Q8(c) \u00a0get_scores_except Spring 2022 MT2 Q8(c) \u00b7 adapted: the HoopGame method is now a function, and HoopPlayer is",
+    "text": [
+     "a data class",
+     "Each HoopPlayer has a strategy and a score. Return a list of the current scores of all players in players",
+     "except player. Keep in mind that multiple players may have the same score. (On the exam this was",
+     "HoopGame.get_scores_except using self.players.)",
+     ""
+    ],
+    "signature": "def get_scores_except(players, player):\n    \"\"\"Collects and returns a list of the current scores for all players\n    except PLAYER.\n    >>> roll_once_strategy = lambda pl, ops: 1\n    >>> roll_twice_strategy = lambda pl, ops: 2\n    >>> player1 = HoopPlayer(roll_twice_strategy)\n    >>> player2 = HoopPlayer(roll_once_strategy)\n    >>> player3 = HoopPlayer(lambda pl, ops: 6)\n    >>> get_scores_except([player1, player2, player3], player2)\n    [0, 0]\n    \"\"\"",
+    "given": "",
+    "provided": "HoopPlayer(strategy, score=0) is a predefined data class.",
+    "solution": "def get_scores_except(players, player):\n    return [pl.score for pl in players if pl is not player]",
+    "explanation": "Filter by identity: is not skips exactly that player object. Comparing scores would drop other players who happen to have the same score, and != on data classes compares all fields, so two different players with the same strategy and score count as equal (see the twin test).",
+    "sol_uses": "a data class Uses code provided by the exam: HoopPlayer(strategy, score=0) is a predefined data class."
+   },
+   {
+    "qnum": "Q8(d)",
+    "title": "roll_dice (Hoop)",
+    "header": "Q8(d) \u00a0roll_dice (Hoop) Spring 2022 MT2 Q8(d) \u00b7 adapted: the HoopGame method is now a function and the dice is a",
+    "text": [
+     "zero-argument function",
+     "Simulate rolling dice exactly num_rolls times. Return the sum of the outcomes unless any outcome is 1, in",
+     "which case return 1. (On the exam each roll was self.dice.roll().)",
+     ""
+    ],
+    "signature": "def roll_dice(dice, num_rolls):\n    \"\"\"Simulate rolling DICE exactly NUM_ROLLS > 0 times. Return sum of\n    the outcomes unless any of the outcomes is 1. In that case, return 1.\n    >>> always_5 = make_test_dice([5])\n    >>> roll_dice(always_5, 4)\n    20\n    \"\"\"",
+    "given": "",
+    "provided": "make_test_dice(outcomes) is predefined. As in Project 1 Hog, it returns a zero-argument dice function: each call dice() returns the next outcome, cycling through the list.",
+    "solution": "def roll_dice(dice, num_rolls):\n    outcomes = [dice() for x in range(num_rolls)]\n    ones = [outcome == 1 for outcome in outcomes]\n    return 1 if any(ones) else sum(outcomes)",
+    "explanation": "The first comprehension calls the dice once per roll. ones is a list of True/False values, one per outcome, so any asks whether some outcome was a 1, and sum adds the outcomes otherwise.",
+    "sol_uses": "zero-argument function Uses code provided by the exam: make_test_dice(outcomes) is predefined. As in Project 1 Hog, it returns a zero- argument dice function: each call dice() returns the next outcome, cycling through the list."
+   }
+  ]
+ },
+ {
+  "id": "sp23",
+  "term": "Spring 2023",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "prefix",
+    "header": "Q3(a) \u00a0prefix Spring 2023 MT2 Q3(a)",
+    "text": [
+     "A prefix sum of a sequence of numbers is the sum of the first n elements for some positive length n.",
+     "Implement prefix, which takes a list of numbers s and returns a list of the prefix sums of s in increasing",
+     "order of the length of the prefix.",
+     ""
+    ],
+    "signature": "def prefix(s):\n    \"\"\"Return a list of all prefix sums of list s.\n    >>> prefix([1, 2, 3, 0, 4, 5])\n    [1, 3, 6, 6, 10, 15]\n    >>> prefix([2, 2, 2, 0, -5, 5])\n    [2, 4, 6, 6, 1, 6]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def prefix(s):\n    return [sum(s[:k+1]) for k in range(len(s))]",
+    "explanation": "k runs over the indices 0 to len(s) - 1, and the prefix ending at index k is s[:k+1] (the slice end is exclusive). Using s[:k] would start with the empty prefix and miss the full list.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "tens",
+    "header": "Q3(b) \u00a0tens Spring 2023 MT2 Q3(b) \u00b7 notation: Link.empty is now ()",
+    "text": [
+     "Implement tens, which takes a non-empty linked list of numbers s. It prints all of the prefix sums of s that",
+     "are multiples of 10, in increasing order of the length of the prefix.",
+     ""
+    ],
+    "signature": "def tens(s):\n    \"\"\"Print all prefix sums of Link s that are multiples of ten.\n    >>> tens(Link(3, Link(9, Link(8, Link(10, Link(0, Link(14, Link(6))))))))\n    20\n    30\n    30\n    50\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def tens(s):\n    def f(suffix, total):\n        if total % 10 == 0:\n            print(total)\n        if suffix != ():\n            f(suffix.rest, total + suffix.first)\n    f(s.rest, s.first)",
+    "explanation": "total is the prefix sum so far and suffix is what has not been added yet. The first call already includes s.first (prefixes have positive length, so 0 is never printed for an empty prefix). Each step adds the next element and keeps going until the suffix is empty.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "count_park",
+    "header": "Q5(a) \u00a0count_park Spring 2023 MT2 Q5(a) \u00b7 also in Lecture 16",
+    "text": [
+     "A motorcycle % takes 1 spot, a car <> takes 2 adjacent spots and . is an empty spot. Return the number of",
+     "ways vehicles can be parked in n adjacent spots. Some or all spots can be empty.",
+     ""
+    ],
+    "signature": "def count_park(n):\n    \"\"\"Count the ways to park cars and motorcycles in n adjacent spots.\n    >>> count_park(1) # '.' or '%'\n    2\n    >>> count_park(2) # '..', '.%', '%.', '%%', or '<>'\n    5\n    >>> count_park(4) # some examples: '<><>', '.%%.', '%<>%', '%.<>'\n    29\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def count_park(n):\n    if n < 0:\n        return 0\n    if n == 0:\n        return 1\n    return 2 * count_park(n-1) + count_park(n-2)",
+    "explanation": "Choose what fills the first spot: empty or a motorcycle (each leaves n - 1 spots) or a car (leaves n - 2). Zero spots can be filled exactly one way. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(b)",
+    "title": "park",
+    "header": "Q5(b) \u00a0park Spring 2023 MT2 Q5(b) \u00b7 adapted: the exam's generator now returns a list",
+    "text": [
+     "Implement park, which takes a non-negative integer n and returns a list of all strings representing n adjacent",
+     "parking spots (% motorcycle, <> car, . empty), in any order.",
+     "sorted(s) returns a new list of the items of s in increasing order.",
+     ""
+    ],
+    "signature": "def park(n):\n    \"\"\"Return the ways to park cars and motorcycles in n adjacent spots.\n    >>> sorted(park(1))\n    ['%', '.']\n    >>> sorted(park(2))\n    ['%%', '%.', '.%', '..', '<>']\n    >>> sorted(park(3))\n    ['%%%', '%%.', '%.%', '%..', '%<>', '.%%', '.%.', '..%', '...', '.<>', '<>%', '<>.']\n    >>> len(park(4))\n    29\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def park(n):\n    if n == 0:\n        return ['']\n    elif n > 0:\n        return ([s + '.' for s in park(n-1)] +\n                [s + '%' for s in park(n-1)] +\n                [s + '<>' for s in park(n-2)])\n    return []",
+    "explanation": "Same three choices as count_park, but each choice builds strings: extend every way to fill n - 1 spots with . or %, and every way to fill n - 2 spots with <>. park(-1) returns an empty list, so the car case adds nothing when n is 1.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(c)",
+    "title": "pack (A+)",
+    "header": "Q5(c) \u00a0pack (A+) Spring 2023 MT2 Q5(c) A+ question \u00b7 adapted: generators f, g and pack now return lists",
+    "text": [
+     "Implement pack, which returns (in any order) all strings for n adjacent spots in which an equal number of",
+     "cars and motorcycles are parked, no motorcycle is adjacent to a car and no empty spot is adjacent to another",
+     "empty spot. In f(n, k), k tracks cars minus motorcycles still owed; g(n, k, no, yes) puts yes in front of",
+     "each way from f(n, k) that does not start with the character no.",
+     "sorted(s) returns a new list of the items of s in increasing order.",
+     ""
+    ],
+    "signature": "def pack(n):\n    \"\"\"Return the ways to park an equal number of cars and motorcycles\n    in n adjacent spots with no motorcycle adjacent to a car and no\n    empty spot adjacent to another empty spot.\n    >>> sorted(pack(4))\n    ['%.<>', '<>.%']\n    >>> sorted(pack(7))\n    ['%%.<><>', '<><>.%%']\n    >>> sorted(pack(8))\n    ['%%.<>.<>', '%%.<><>.', '%.%.<><>', '%.<><>.%', '.%%.<><>', '.<><>.%%', '<>.%%.<>', '<>.<>.%%', '<><>.%%.', '<><>.%.%']\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def pack(n):\n    def f(n, k):\n        if n == 0 and k == 0:\n            return ['']\n        elif n > 0:\n            return g(n-1, k-1, '<', '%') + g(n-1, k, '.', '.') + g(n-2, k+1, '%', '<>')\n        return []\n    def g(n, k, no, yes):\n        return [yes + s for s in f(n, k) if not s or s[0] != no]\n    return f(n, 0)",
+    "explanation": "g builds every arrangement of the remaining spots, then keeps only those whose first character may sit next to yes: a % cannot be followed by a car (<), a . cannot be followed by ., and a car cannot be followed by %. Check not s first, because s[0] on the empty string is an error.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "sp24",
+  "term": "Spring 2024",
+  "questions": [
+   {
+    "qnum": "Q4(a)",
+    "title": "is_strip",
+    "header": "Q4(a) \u00a0is_strip Spring 2024 MT2 Q4(a)",
+    "text": [
+     "A strip is a list of integers in which each integer is one more than the one before, e.g. [3, 4, 5, 6]. Empty",
+     "and one-element lists are strips. Implement is_strip.",
+     ""
+    ],
+    "signature": "def is_strip(s):\n    \"\"\"Return whether list s is a strip.\n    >>> is_strip([3, 4, 5, 6])\n    True\n    >>> is_strip([3, 3, 3]) # 3 after 3\n    False\n    >>> is_strip([3, 4, 5, 4, 6]) # 4 after 5\n    False\n    >>> is_strip([3, 4, 5, 5, 6]) # 5 after 5\n    False\n    >>> is_strip([3, 4, 5, 6, 8]) # 8 after 6\n    False\n    >>> is_strip([5])\n    True\n    >>> is_strip([])\n    True\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def is_strip(s):\n    assert type(s) == list\n    return len(s) == 0 or s == list(range(s[0], s[0] + len(s)))",
+    "explanation": "A non-empty strip is exactly the run of len(s) integers starting at s[0], which is list(range(s[0], s[0] + len(s))). The empty check must come first and short-circuit with or, because s[0] would raise an error on an empty list.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "drip",
+    "header": "Q4(b) \u00a0drip Spring 2024 MT2 Q4(b)",
+    "text": [
+     "Implement drip, which takes two non-empty lists of integers s and t and returns whether their elements can",
+     "be interleaved (keeping each list in order) into a strip that starts with s[0].",
+     "",
+     ""
+    ],
+    "signature": "def drip(s, t):\n    \"\"\"Return whether there is a strip made out of interleaving s and t.\n    >>> drip([1, 3, 5], [2, 4, 6]) # 1 2 3 4 5 6\n    True\n    >>> drip([1, 4, 5], [2, 3, 6]) # 1 2 3 4 5 6\n    True\n    >>> drip([1, 2, 3], [4, 5, 6]) # 1 2 3 4 5 6\n    True\n    >>> drip([2, 4, 5], [1, 3, 6]) # No strip starting with 2 can contain 1\n    False\n    >>> drip([1, 2, 4, 5], [1, 3, 6]) # No strip can contain 1 and 1\n    False\n    >>> drip([1, 4, 5], [2, 3, 7]) # No strip can contain 5 and 7 but no 6\n    False\n    >>> drip([1, 5, 4], [2, 3, 6]) # No strip can contain 5 before 4\n    False\n    >>> drip([2], [3, 4, 5]) # 2 3 4 5\n    True\n    >>> drip([1], [2, 3, 5]) # No strip can contain 3 and 5 but no 4\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "is_strip(s) from part (a) is predefined.",
+    "solution": "def drip(s, t):\n    while s and t:\n        if s[0] + 1 == t[0]:\n            s, t = t, s[1:]\n        elif len(s) > 1 and s[0] + 1 == s[1]:\n            s = s[1:]\n        else:\n            return False\n    return is_strip(s) and is_strip(t)",
+    "explanation": "The loop keeps the list holding the current strip element in s. If the next element is at the front of t, the lists swap roles and the used element is dropped: s, t = t, s[1:]. If it is the next element of s (checking the length first so s[1] exists), drop the front of s; otherwise the strip is broken. Once one list is empty, whatever is left must itself be a strip. ",
+    "sol_uses": "Uses code provided by the exam: is_strip(s) from part (a) is predefined."
+   },
+   {
+    "qnum": "Q4(c)",
+    "title": "longest (strip)",
+    "header": "Q4(c) \u00a0longest (strip) Spring 2024 MT2 Q4(c) \u00b7 adapted: result.append(k) replaced by result = result + [k] (no",
+    "text": [
+     "mutation)",
+     "Implement longest, which takes a list of integers s and returns the longest strip whose elements appear in s",
+     "in order. If two such strips are equally long, return the one that starts earlier in s. s[-1] is the last element of",
+     "s.",
+     "",
+     ""
+    ],
+    "signature": "def longest(s):\n    \"\"\"Return the longest strip whose elements appear in s in order.\n    >>> longest([4, 2, 3, 5, 6, 4, 6, 5]) # 2 3 4 5 is the longest strip in s\n    [2, 3, 4, 5]\n    >>> longest([4, 2, 3, 5, 6, 4]) # 4 5 6 is as long as 2 3 4 and is earlier\n    [4, 5, 6]\n    >>> longest([2, 4, 6])\n    [2]\n    \"\"\"\n\ndef longest_with_s0(s):\n    \"\"\"Return the longest strip in s that starts with s[0].\"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def longest(s):\n    if len(s) == 0:\n        return []\n    return max([longest_with_s0(s), longest(s[1:])], key=len)\ndef longest_with_s0(s):\n    result = s[:1]\n    for k in s[1:]:\n        if k == result[-1] + 1:\n            result = result + [k]\n    return result",
+    "explanation": "The longest strip either starts with s[0] (handled greedily by longest_with_s0, which grabs each next needed value as soon as it appears) or does not use s[0], in which case it is longest(s[1:]). max with key=len picks the longer, and on a tie it keeps the first one in the list, which is the strip starting earlier. s[:1] starts the strip as a one-element list.",
+    "sol_uses": "mutation)"
+   }
+  ]
+ },
+ {
+  "id": "sp25",
+  "term": "Spring 2025",
+  "questions": [
+   {
+    "qnum": "Q5(a)",
+    "title": "muladd",
+    "header": "Q5(a) \u00a0muladd Spring 2025 MT2 Q5(a) \u00b7 adapted: Link.empty written as ()",
+    "text": [
+     "Implement muladd, which takes a linked list of numbers s and returns the value of the expression that puts *",
+     "between the first pair, + between the next pair, and keeps alternating (normal precedence, so products",
+     "happen first). A one-element list gives that element.",
+     ""
+    ],
+    "signature": "def muladd(s):\n    \"\"\"Combine the numbers in linked list s by alternately multiplying and adding.\n    >>> example = Link(9, Link(4, Link(7, Link(2, Link(0))))) # (9 4 7 2 0)\n    >>> muladd(example) # 9 * 4 + 7 * 2 + 0, not 9 * (4 + 7 * (2 + 0))\n    50\n    >>> muladd(Link(2, example)) # 2 * 9 + 4 * 7 + 2 * 0\n    46\n    >>> muladd(Link(2))\n    2\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def muladd(s):\n    if s == ():\n        return 0\n    elif s.rest == ():\n        return s.first\n    else:\n        return s.first * s.rest.first + muladd(s.rest.rest)",
+    "explanation": "The pattern repeats every two elements: multiply the first two, then add the result of the same pattern on the list two steps on (s.rest.rest). A single leftover element is just added, and an empty remainder adds 0.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(b)",
+    "title": "ways",
+    "header": "Q5(b) \u00a0ways Spring 2025 MT2 Q5(b)",
+    "text": [
+     "A plus-times expression puts + or * between each adjacent pair of n numbers. Implement ways, which returns",
+     "how many such expressions have at most k * symbols in a row.",
+     ""
+    ],
+    "signature": "def ways(k, n):\n    \"\"\"Return the number of plus-times-expressions with at most k consecutive *'s for n numbers.\n    >>> ways(1, 4) # For [2, 3, 4, 5], these 5 ways: 2+3+4+5, 2+3+4*5, 2+3*4+5, 2*3+4+5, 2*3+4*5\n    5\n    >>> ways(2, 4) # For [2, 3, 4, 5], the 7 ways would also include 2+3*4*5 and 2*3*4+5\n    7\n    >>> ways(2, 5) # Some examples for [2, 3, 4, 5, 6]: 2+3*4+5*6 & 2*3*4+5*6 (but not 2+3*4*5*6)\n    13\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def ways(k, n):\n    def f(left, n):\n        if n == 1:\n            return 1\n        result = f(k, n - 1)\n        if left:\n            result += f(left - 1, n - 1)\n        return result\n    return f(k, n)",
+    "explanation": "left is how many more * symbols may follow in the current run. With one number left there are no gaps, so there is one way. Choosing + for the next gap resets the allowance to k; choosing * is only allowed if left is positive and uses one up. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(c)",
+    "title": "close",
+    "header": "Q5(c) \u00a0close Spring 2025 MT2 Q5(c)",
+    "text": [
+     "Implement close, which takes a list of numbers s and a number x and returns the value of some plus-times",
+     "expression for s that is closest to x. A slice that starts past the end of a list is empty."
+    ],
+    "signature": "def close(s, x):\n    \"\"\"Return the value of a plus-times-expression for s that is closest to x.\n    >>> print(close([1, 2, 3, 4], 10)) # 1 + 2 + 3 + 4 = 10\n    10\n    >>> print(close([1, 2, 3, 4], 20)) # 1 * 2 * 3 * 4 = 24 (4 away from 20)\n    24\n    >>> print(close([1, 2, 3, 4], 30)) # 1 + 2 * 3 * 4 = 25 (5 away from 30)\n    25\n    >>> print(close([3, 7, 5, 4, 2, 6], 66)) # 3 * 7 + 5 * 4 * 2 + 6 = 67 (1 away from 66)\n    67\n    \"\"\"",
+    "given": "def product(s):\n    \"\"\"Return the result of multiplying together the elements of a non-empty list of numbers s.\"\"\"\n    if len(s) == 1:\n        return s[0]\n    return s[0] * product(s[1:])",
+    "provided": "",
+    "solution": "def close(s, x):\n    if not s:\n        return 0\n    choices = [product(s[:i]) + close(s[i:], x - product(s[:i])) for i in range(1, len(s) + 1)]\n    return min(choices, key=lambda y: abs(x - y))\ndef product(s):\n    if len(s) == 1:\n        return s[0]\n    return s[0] * product(s[1:])",
+    "explanation": "Every plus-times expression starts with a product of the first i numbers followed by + and an expression for the rest. For each i, the best rest is the one closest to what is still needed, x - product(s[:i]). The final min uses a one-argument key measuring distance to x; abs alone would pick the smallest value, not the closest.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(d)",
+    "title": "close_exp (A+)",
+    "header": "Q5(d) \u00a0close_exp (A+) Spring 2025 MT2 Q5(d) (A+ question)",
+    "text": [
+     "Fill in close_exp, which returns a string holding a plus-times expression for s whose value is as close as",
+     "possible to x. The built-in eval takes a string containing an expression and returns its value, so eval('2+2')",
+     "is 4.",
+     "",
+     ""
+    ],
+    "signature": "def close_exp(s, x):\n    \"\"\"Return the plus-times-expression of s that has a value closest to x.\n    >>> print(close_exp([1, 2, 3, 4], 10)) # 1 + 2 + 3 + 4 = 10\n    1+2+3+4\n    >>> print(close_exp([1, 2, 3, 4], 20)) # 1 * 2 * 3 * 4 = 24 (4 away from 20)\n    1*2*3*4\n    >>> print(close_exp([1, 2, 3, 4], 30)) # 1 + 2 * 3 * 4 = 25 (5 away from 30)\n    1+2*3*4\n    >>> print(close_exp([3, 7, 5, 4, 2, 6], 66)) # 3 * 7 + 5 * 4 * 2 + 6 = 67 (1 away from 66)\n    3*7+5*4*2+6\n    \"\"\"",
+    "given": "",
+    "provided": "close(s, x) from part (c) and product(s) are predefined.",
+    "solution": "def close_exp(s, x):\n    goal = close(s, x)\n    term = ''\n    for i in range(len(s)):\n        if term:\n            term += '*'\n        term += str(s[i])\n        candidate = term\n        if i < len(s) - 1:\n            candidate += '+' + close_exp(s[i+1:], x - eval(term))\n        if eval(candidate) == goal:\n            return candidate",
+    "explanation": "This mirrors close: term is the product of the first i + 1 numbers written as a string, and the rest of the expression is the best expression for the remaining numbers with target x - eval(term). Joining them with '+' gives a candidate, and the first candidate whose value equals the best possible value goal is returned.",
+    "sol_uses": "Uses code provided by the exam: close(s, x) from part (c) and product(s) are predefined."
+   }
+  ]
+ },
+ {
+  "id": "sp26",
+  "term": "Spring 2026",
+  "questions": [
+   {
+    "qnum": "Q7",
+    "title": "circle and earring",
+    "header": "Q7 \u00a0circle and earring Spring 2026 MT2 Q7",
+    "text": [
+     "Friends sit in a circle and take turns adding beads to an earring of exactly s beads. On friend i's turn they add",
+     "m beads where 1 <= m <= limit[i]. You are friend 0 and go first. Implement circle (the next friend after f",
+     "in a circle of n) and earring, which returns the total number of ways to make the earring. Assume every",
+     "limit[i] >= 1 and len(limit) >= 2.",
+     "",
+     ""
+    ],
+    "signature": "def circle(f, n):\n    \"\"\"Return the next friend given the current friend f and total people in the circle n.\n    >>> circle(0, 2)\n    1\n    >>> circle(4, 5)\n    0\n    >>> circle(3, 6)\n    4\n    \"\"\"\n\ndef earring(s, limit):\n    \"\"\"Return the total number of earrings of length s.\n    In the doctests, each dashed sequence represents a potential earring, where each dash separates\n    a friend's turn and the number of beads they put on in their turn.\n    >>> earring(3, [1, 2]) # 1-2, 1-1-1\n    2\n    >>> earring(4, [2, 1]) # 1-1-2, 2-1-1, 1-1-1-1\n    3\n    >>> earring(5, [1, 1, 1, 1, 1]) # 1-1-1-1-1\n    1\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def circle(f, n):\n    return (f + 1) % n\ndef earring(s, limit):\n    def helper(friend, length_left):\n        if length_left == 0:\n            return 1\n        next_f = circle(friend, len(limit))\n        return sum([helper(next_f, length_left - m) for m in range(1, min(limit[friend], length_left) + 1)])\n    return helper(0, s)",
+    "explanation": "The helper tracks whose turn it is and how many beads are still needed; when none are left, exactly one finished earring has been made. Each call tries every legal count m from 1 up to the smaller of the friend's limit and the beads left (so you never overshoot), passes the turn to circle(friend, len(limit)) and adds up the counts with sum. Using % in circle wraps the last friend back to 0.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q8",
+    "title": "convert",
+    "header": "Q8 \u00a0convert Spring 2026 MT2 Q8 \u00b7 adapted: Link.empty written as (), doctests use print",
+    "text": [
+     "Write convert, which takes a list and returns a linked list with the same elements in the same order. If an",
+     "element is itself a list, put it in the linked list as is (do not convert it).",
+     ""
+    ],
+    "signature": "def convert(lst):\n    \"\"\"\n    >>> print(convert([1, 2, 3]))\n    (1 2 3)\n    >>> print(convert([1, [2, 3], 4]))\n    (1 [2, 3] 4)\n    >>> convert([])\n    ()\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def convert(lst):\n    if not lst:\n        return ()\n    return Link(lst[0], convert(lst[1:]))",
+    "explanation": "An empty list becomes the empty linked list (). Otherwise the first element becomes first and the converted remainder lst[1:] becomes rest. Building from the back iteratively (for item in reversed(lst): tail = Link(item, tail)) also works without any mutation.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "su20",
+  "term": "Summer 2020",
+  "questions": [
+   {
+    "qnum": "Q2",
+    "title": "schedule",
+    "header": "Q2 \u00a0schedule Summer 2020 MT2 Q2 \u00b7 adapted: the official ans += ... line is written as ans = ans + ... (both accepted)",
+    "text": [
+     "A galaxy is a string of digits and '?'s. A completion of a galaxy replaces each '?' with a digit. Find all",
+     "completions of galaxy that use digits up to max_digit and whose digits sum to sum_to. int and str convert",
+     "between digits and strings, and strings can be indexed and sliced like lists.",
+     "",
+     ""
+    ],
+    "signature": "def schedule(galaxy, sum_to, max_digit):\n    \"\"\"\n    >>> schedule('?????', 25, 5)\n    ['55555']\n    >>> schedule('???', 5, 2)\n    ['122', '212', '221']\n    >>> schedule('?2??11?', 5, 3)\n    ['0200111', '0201110', '0210110', '1200110']\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def schedule(galaxy, sum_to, max_digit):\n    def schedule_helper(galaxy, sum_sofar, index):\n        if index >= len(galaxy) and sum_sofar == sum_to:\n            return [galaxy]\n        elif sum_sofar > sum_to or index >= len(galaxy):\n            return []\n        elif galaxy[index] != '?':\n            return schedule_helper(galaxy, sum_sofar + int(galaxy[index]), index + 1)\n        ans = []\n        for x in range(max_digit + 1):\n            modified_galaxy = galaxy[:index] + str(x) + galaxy[index + 1:]\n            ans = ans + schedule_helper(modified_galaxy, sum_sofar + x, index + 1)\n        return ans\n    return schedule_helper(galaxy, 0, 0)",
+    "explanation": "The helper walks the string by index while tracking the digit sum so far. Reaching the end with the right sum gives one completion; going over the sum or reaching the end with the wrong sum gives none. A fixed digit just adds to the sum, while a ? branches into every digit from 0 to max_digit, rebuilding the string with slicing because strings cannot be changed in place.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3 (microscope)",
+    "title": "microscope",
+    "header": "Q3 (microscope) \u00a0microscope Summer 2020 MT2 Q3 (first function)",
+    "text": [
+     "A painting is a function that takes one integer and returns two values: another painting and an integer (see",
+     "identity_painting). Implement microscope, which returns a painting that processes a sequence of integers",
+     "and returns the alternating sum of all integers seen so far.",
+     ""
+    ],
+    "signature": "def microscope(a=0, s=1):\n    \"\"\"\n    >>> painting_a = microscope()\n    >>> painting_b, x = painting_a(2)\n    >>> x                                   # 2\n    2\n    >>> painting_c, x = painting_b(8)\n    >>> x                                   # 2 - 8\n    -6\n    >>> painting_d, x = painting_c(12)\n    >>> x                                   # 2 - 8 + 12\n    6\n    >>> painting_e, x = painting_d(30)\n    >>> x                                   # 2 - 8 + 12 - 30\n    -24\n    >>> painting_b_again, x = painting_a(100)\n    >>> x                                   # 100 [note that we are using painting_a not painting_d here]\n    100\n    \"\"\"",
+    "given": "def identity_painting(x):\n    return identity_painting, x",
+    "provided": "",
+    "solution": "def identity_painting(x):\n    return identity_painting, x\ndef microscope(a=0, s=1):\n    def painting(x):\n        return microscope(a + s * x, -s), a + s * x\n    return painting",
+    "explanation": "The two default parameters are the state: a is the alternating sum so far and s is the sign the next number gets. Each call returns the new sum and a fresh painting whose sum is updated and whose sign is flipped. Because nothing is mutated, calling an old painting again (like painting_a) still starts from its own sum. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3 (plush)",
+    "title": "plush",
+    "header": "Q3 (plush) \u00a0plush Summer 2020 MT2 Q3 (second function)",
+    "text": [
+     "plush takes a painting and a non-empty list of items, runs the painting on each item in turn (always using",
+     "the painting returned by the previous call), and returns the final number. With microscope() on [1, 2, 3,",
+     "4, 5] it returns 1 - 2 + 3 - 4 + 5 = 3.",
+     ""
+    ],
+    "signature": "def plush(painting, items):\n    \"\"\"\n    >>> plush(microscope(), [1, 2, 3, 4, 5])\n    3\n    >>> plush(microscope(), [4000])\n    4000\n    >>> plush(microscope(), [2, 90])\n    -88\n    >>> plush(identity_painting, [2, 90])\n    90\n    \"\"\"",
+    "given": "",
+    "provided": "Predefined: identity_painting and a working microscope from the first part.",
+    "solution": "def plush(painting, items):\n    painting, x = painting(items[0])\n    if len(items) == 1:\n        return x\n    return plush(painting, items[1:])",
+    "explanation": "Call the current painting on the first item, which hands back the next painting and a number. If that was the last item, the number is the answer; otherwise recurse with the new painting on items[1:]. Rebinding painting to the returned painting is what chains the calls together.",
+    "sol_uses": "Uses code provided by the exam: Predefined: identity_painting and a working microscope from the first part."
+   },
+   {
+    "qnum": "Q5",
+    "title": "subsaltshaker",
+    "header": "Q5 \u00a0subsaltshaker Summer 2020 MT2 Q5",
+    "text": [
+     "A saltshaker is a sequence of d digits that are all d, such as 1, 4444 or 7777777 (so 1 <= d <= 9).",
+     "Implement subsaltshaker, which takes an integer disk and returns whether disk contains a saltshaker as",
+     "consecutive digits.",
+     "",
+     "",
+     ""
+    ],
+    "signature": "def subsaltshaker(disk):\n    \"\"\"\n    >>> subsaltshaker(2233) # 22 counts\n    True\n    >>> subsaltshaker(2444423) # 4444 counts\n    True\n    >>> subsaltshaker(82223) # 22 counts even if it appears as part of 222\n    True\n    >>> subsaltshaker(234562) # 2...2 does not count if the 2s are not consecutive\n    False\n    >>> subsaltshaker(1) # 1 counts\n    True\n    >>> subsaltshaker(498729879871) # 1 counts\n    True\n    >>> subsaltshaker(149872987987) # 1 counts\n    True\n    >>> subsaltshaker(4445555) # no saltshakers in this number\n    False\n    >>> subsaltshaker(20) # no saltshakers in this number\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def subsaltshaker(disk):\n    current_digit = disk % 10\n    count = 0\n    while disk != 0:\n        last = disk % 10\n        if current_digit == last:\n            count += 1\n        else:\n            count = 1\n            current_digit = last\n        if count == current_digit:\n            return True\n        disk = disk // 10\n    return False",
+    "explanation": "Read digits from the right, keeping the digit of the current run and the length of that run. A matching digit extends the run; a different digit starts a new run of length 1 and becomes the current digit. As soon as a run's length equals its digit you have found a saltshaker, so return True immediately; count starts at 0 because the first loop iteration counts the last digit. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6",
+    "title": "copycat",
+    "header": "Q6 \u00a0copycat Summer 2020 MT2 Q6",
+    "text": [
+     "copycat takes a list of strings lst1 and a list of integers lst2. It returns a new list where each element of",
+     "lst1 is copied the number of times given by the corresponding element of lst2. If that number is negative (-",
+     "k), it removes the previous k elements added instead. Ignore extra elements in the longer list; you will never",
+     "be asked to delete more elements than exist.",
+     ""
+    ],
+    "signature": "def copycat(lst1, lst2):\n    \"\"\"\n    >>> copycat(['a', 'b', 'c'], [1, 2, 3])\n    ['a', 'b', 'b', 'c', 'c', 'c']\n    >>> copycat(['a', 'b', 'c'], [3])\n    ['a', 'a', 'a']\n    >>> copycat(['a', 'b', 'c'], [0, 2, 0])\n    ['b', 'b']\n    >>> copycat([], [1,2,3])\n    []\n    >>> copycat(['a', 'b', 'c'], [1, -1, 3])\n    ['c', 'c', 'c']\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def copycat(lst1, lst2):\n    def copycat_helper(lst1, lst2, lst_so_far):\n        if len(lst1) == 0 or len(lst2) == 0:\n            return lst_so_far\n        if lst2[0] >= 0:\n            lst_so_far = lst_so_far + [lst1[0] for _ in range(lst2[0])]\n        else:\n            lst_so_far = lst_so_far[:lst2[0]]\n        return copycat_helper(lst1[1:], lst2[1:], lst_so_far)\n    return copycat_helper(lst1, lst2, [])",
+    "explanation": "The helper carries the result built so far as an extra parameter and consumes one pair of elements per call. A non-negative count appends that many copies with a comprehension; a negative count -k drops the last k elements, which is exactly the slice lst_so_far[:lst2[0]] because a negative stop counts from the end. The condition must be >= 0: with > 0, a count of 0 would slice to [:0] and wipe the list.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "su21",
+  "term": "Summer 2021",
+  "questions": [
+   {
+    "qnum": "Q2(a)",
+    "title": "order_order",
+    "header": "Q2(a) \u00a0order_order Summer 2021 Midterm Q2(a)",
+    "text": [
+     "Write a function order_order which takes a non-empty list of 2-argument functions operators and returns a",
+     "new 2-argument function. When called, this returned function prints the result of applying the first function",
+     "in operators to its two arguments. It then returns another function that applies the second function in",
+     "operators, and so on. After the last function in operators it cycles back to the first one on the next call.",
+     ""
+    ],
+    "signature": "def order_order(operators):\n    \"\"\"\n    >>> from operator import add, mul, sub\n    >>> ops = [add, mul, sub]\n    >>> order = order_order(ops)\n    >>> order = order(1, 2) # applies add and returns mul\n    3\n    >>> order = order(1, 2) # applies mul and returns sub\n    2\n    >>> order = order(1, 2) # applies sub and cycles back to return add\n    -1\n    >>> order = order(1, 2) # cycles back to applying add\n    3\n    >>> order = order(1, 2)\n    2\n    >>> order = order(1, 2)\n    -1\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def order_order(operators):\n    def apply(x, y):\n        print(operators[0](x, y))\n        return order_order(operators[1:] + [operators[0]])\n    return apply",
+    "explanation": "Each call to apply uses the function at the front of the list, then returns a brand-new apply built from the list rotated one step to the left. The rotation operators[1:] + [operators[0]] moves the first function to the back without mutating anything, which is what makes the cycle wrap around. The outer function returns apply itself, not a call to it.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q2(b)",
+    "title": "list_skipper",
+    "header": "Q2(b) \u00a0list_skipper Summer 2021 Midterm Q2(b)",
+    "text": [
+     "A skip list of a list is a sublist in which no two elements were adjacent in the original list. For [5, 6, 8, 2],",
+     "the lists [5, 8], [5, 2], [6, 2], [5], [6], [8], [2] and [] are all skip lists; the empty list is always one.",
+     "Given a list int_lst of unique integers, return a list of all unique skip lists of int_lst whose integers are in",
+     "strictly increasing order.",
+     ""
+    ],
+    "signature": "def list_skipper(int_lst):\n    \"\"\"\n    >>> list_skipper([5,6,8,2])\n    [[5, 8], [5], [6], [8], [2], []]\n    >>> list_skipper([1,2,3,4,5])\n    [[1, 3, 5], [1, 3], [1, 4], [1, 5], [1], [2, 4], [2, 5], [2], [3, 5], [3], [4], [5], []]\n    >>> list_skipper([])\n    [[]]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def list_skipper(int_lst):\n    if len(int_lst) == 0:\n        return [[]]\n    with_first = list_skipper(int_lst[2:])\n    without_first = list_skipper(int_lst[1:])\n    with_first = [[int_lst[0]] + x for x in with_first if x == [] or x[0] > int_lst[0]]\n    return with_first + without_first",
+    "explanation": "Include or exclude the first element. If you include it, the next element is off limits, so recurse on int_lst[2:]; if you exclude it, recurse on int_lst[1:]. A skip list from the rest can only go after int_lst[0] if it is empty or starts with something bigger, which keeps the result strictly increasing. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4",
+    "title": "max_exp (from exp_tree)",
+    "header": "Q4 \u00a0max_exp (from exp_tree) Summer 2021 Midterm Q4 \u00b7 adapted: returns the maximum value instead of a tree (trees",
+    "text": [
+     "are after the cutoff); blank (f) dropped",
+     "The maximum exponentiation of a list of integers values is the largest number you can get by repeatedly",
+     "combining pairs of neighbouring elements with **. For [3, 1, 2, 3], (3 ** 1) ** (2 ** 3) gives 6561,",
+     "which is the maximum. Implement max_exp, which takes a non-empty list of positive integers and returns its",
+     "maximum exponentiation. The last ** applied splits values into a base part and an exponent part.",
+     ""
+    ],
+    "signature": "def max_exp(values):\n    \"\"\"Returns the maximum exponentiation of VALUES.\n    >>> max_exp([5])\n    5\n    >>> max_exp([3, 2])\n    9\n    >>> max_exp([2, 3, 2])\n    512\n    >>> max_exp([3, 1, 2, 3])\n    6561\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def max_exp(values):\n    if len(values) == 1:\n        return values[0]\n    else:\n        def exp_at_split(i):\n            base = max_exp(values[:i])\n            exponent = max_exp(values[i:])\n            return base ** exponent\n        exps = [exp_at_split(i) for i in range(1, len(values))]\n        return max(exps)",
+    "explanation": "Try every split point i: everything before i becomes the base and everything from i on becomes the exponent. With positive integers a bigger base or exponent never makes the power smaller, so the best result at a split uses the maximum of each side, found recursively. A single value cannot be combined, so it is its own maximum.",
+    "sol_uses": "are after the cutoff); blank (f) dropped"
+   },
+   {
+    "qnum": "Q5(b)",
+    "title": "add_seen_d",
+    "header": "Q5(b) \u00a0add_seen_d Summer 2021 Midterm Q5(b)",
+    "text": [
+     "A repeatable function returns another repeatable function, forever. Implement add_seen_d, which takes an",
+     "integer d and returns a repeatable function inner. When inner is called on an integer, it prints the sum of all",
+     "integers that have been passed to it at least d times so far in the chain of calls. You also implement",
+     "make_seen_function, which returns a seen function: a function that takes a value and returns how many",
+     "times that value has been seen. You may not use lists or dictionaries.",
+     "",
+     "initial_seen = lambda x: 0",
+     "",
+     ""
+    ],
+    "signature": "def add_seen_d(d, seen_fn=initial_seen, total=0):\n    \"\"\"\n    >>> a = add_seen_d(2)\n    >>> a = a(3)\n    0\n    >>> a = a(4)\n    0\n    >>> a = a(3) # 3 seen for the 2nd time, thus added\n    3\n    >>> a = a(3) # 3 seen for the 3rd time, and won't be added again\n    3\n    >>> a = a(4) # 4 seen for the 2nd time, thus added\n    7\n    >>> a = a(5) # 5 is seen for the 1st time, so not added\n    7\n    \"\"\"\n\ndef make_seen_function(f, msvar):",
+    "given": "",
+    "provided": "",
+    "solution": "initial_seen = lambda x: 0\ndef add_seen_d(d, seen_fn=initial_seen, total=0):\n    def inner(innervar):\n        new_seen = make_seen_function(seen_fn, innervar)\n        if new_seen(innervar) == d:\n            print(total + innervar)\n            return add_seen_d(d, new_seen, total + innervar)\n        else:\n            print(total)\n            return add_seen_d(d, new_seen, total)\n    return inner\ndef make_seen_function(f, msvar):\n    def seen(seenvar):\n        if msvar == seenvar:\n            return 1 + f(msvar)\n        return f(seenvar)\n    return seen",
+    "explanation": "The seen function plays the role of a dictionary: make_seen_function(f, msvar) answers one more than f for msvar and defers to f for everything else. Each call to inner first records the new value, then adds it to the total only on the call where its count becomes exactly d, so later repeats are not added again. The updated seen function and total travel forward as arguments to add_seen_d.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "su22",
+  "term": "Summer 2022",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "inverse_checker",
+    "header": "Q3(a) \u00a0inverse_checker Summer 2022 Midterm Q3(a)",
+    "text": [
+     "Implement inverse_checker, which takes two functions f and g and returns a function that returns True if g",
+     "undoes the effect of f called on n.",
+     ""
+    ],
+    "signature": "def inverse_checker(f, g):\n    \"\"\"\n    >>> checker0 = inverse_checker(lambda x: x + 1, lambda x: x - 1)\n    >>> all([checker0(n) for n in range(100)])\n    True\n    >>> # `g` is the inverse `f`, but `f` is not the inverse of `g`\n    >>> checker1 = inverse_checker(lambda x: x * 2, lambda x: x // 2)\n    >>> all([checker1(n) for n in range(100)])\n    True\n    >>> checker2 = inverse_checker(lambda x: x ** 3, lambda x: x ** -3)\n    >>> all([checker2(n) for n in range(1, 100)])\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def inverse_checker(f, g):\n    def checker(n):\n        return g(f(n)) == n\n    return checker",
+    "explanation": "\"g undoes f\" means applying f then g gets back to n, so the order is g(f(n)), not f(g(n)). The outer function returns the inner function without calling it.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "force_truthy",
+    "header": "Q3(b) \u00a0force_truthy Summer 2022 Midterm Q3(b)",
+    "text": [
+     "Implement force_truthy, which takes a function f and returns a function that returns the same thing as f",
+     "when f(n) is a truthy value, and otherwise returns True.",
+     ""
+    ],
+    "signature": "def force_truthy(f):\n    \"\"\"\n    >>> truthy = force_truthy(lambda x: x // 10)\n    >>> all([truthy(n) for n in range(10)])\n    True\n    >>> truthy(9)\n    True\n    >>> truthy(10)\n    1\n    >>> truthy(20)\n    2\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def force_truthy(f):\n    def truthy(n):\n        return f(n) or True\n    return truthy",
+    "explanation": "or returns its first truthy operand, so f(n) or True gives f(n) itself when it is truthy and True otherwise. Writing True or f(n) would always return True.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4",
+    "title": "least_resistance",
+    "header": "Q4 \u00a0least_resistance Summer 2022 Midterm Q4",
+    "text": [
+     "least_resistance(m, n, f) finds the path of least resistance from (m, n) to (0, 0) on a grid, where each",
+     "step goes one down or one left, and returns its total resistance: the sum of f called on each position visited",
+     "(both ends included). float('inf') is larger than any number.",
+     ""
+    ],
+    "signature": "def least_resistance(m, n, f):\n    \"\"\"\n    >>> f = lambda x, y: x ** 2 + y ** 2\n    >>> least_resistance(5, 5, f)\n    195\n    >>> g = lambda x, y: y\n    >>> least_resistance(5, 5, g)\n    15\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def least_resistance(m, n, f):\n    if m == 0 and n == 0:\n        return f(0, 0)\n    elif m < 0 or n < 0:\n        return float('inf')\n    else:\n        r1 = least_resistance(m - 1, n, f)\n        r2 = least_resistance(m, n - 1, f)\n        return min(r1, r2) + f(m, n)",
+    "explanation": "Two choices per step (left or down) gives tree recursion; min picks the cheaper rest of the path and you add the resistance of the current square. Stepping off the grid returns infinity so min never chooses it. The two recursive calls in (d) and (e) can be swapped as a pair. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5",
+    "title": "cond_curry",
+    "header": "Q5 \u00a0cond_curry Summer 2022 Midterm Q5",
+    "text": [
+     "Implement cond_curry, which takes a two-argument function f and a predicate cond. It returns a curried",
+     "version of f that only accepts an argument x if cond(x) is True; otherwise x is ignored. Once it has accepted",
+     "two arguments, it behaves exactly as f would on them.",
+     ""
+    ],
+    "signature": "def cond_curry(f, cond):\n    \"\"\"\n    >>> from operator import add\n    >>> curried = cond_curry(add, is_prime) # assume `is_prime` is implemented\n    >>> curried(11)(13) # 11 + 13 = 24\n    24\n    >>> curried(10)(11)(12)(13) # 10 and 12 are not prime, and so are ignored\n    24\n    >>> curried(7)(4)(4)(4)(4)(4)(4)(4)(4)(7)\n    14\n    \"\"\"",
+    "given": "",
+    "provided": "is_prime(n) is predefined.",
+    "solution": "def cond_curry(f, cond):\n    def g(x):\n        def h(y):\n            if cond(y):\n                return f(x, y)\n            return h\n        if cond(x):\n            return h\n        return g\n    return g",
+    "explanation": "g waits for the first accepted argument: if cond(x) fails it returns itself so the next call tries again, otherwise it returns h, which remembers x. h does the same for the second argument and finally calls f(x, y). Returning the function itself is how a rejected argument gets ignored.",
+    "sol_uses": "Uses code provided by the exam: is_prime(n) is predefined."
+   },
+   {
+    "qnum": "Q6(a)",
+    "title": "count_digits",
+    "header": "Q6(a) \u00a0count_digits Summer 2022 Midterm Q6(a)",
+    "text": [
+     "Implement count_digits, which takes a number n and returns the number of digits n contains. Treat 0 as",
+     "having no digits.",
+     ""
+    ],
+    "signature": "def count_digits(n):\n    \"\"\"\n    >>> count_digits(0) # 0 has no digits\n    0\n    >>> count_digits(618)\n    3\n    >>> count_digits(2022)\n    4\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def count_digits(n):\n    if n == 0:\n        return 0\n    return 1 + count_digits(n // 10)",
+    "explanation": "Each call removes one digit with // 10 and counts it. Because 0 has no digits, the base case is n == 0 returning 0, which also ends the recursion for every other number.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6(b)",
+    "title": "blob_sum",
+    "header": "Q6(b) \u00a0blob_sum Summer 2022 Midterm Q6(b)",
+    "text": [
+     "Implement blob_sum, which takes positive integers n and k and returns True if the digits of n, each used",
+     "exactly once and read left to right, can be added to equal k. Consecutive digits may be grouped into one",
+     "multi-digit number (a blob). For example, 123 can blob_sum to 15 (12 + 3) but not 33. You may use",
+     "count_digits.",
+     "",
+     ""
+    ],
+    "signature": "def blob_sum(n, k):\n    \"\"\"\n    >>> blob_sum(123, 15) # 12 + 3 = 15\n    True\n    >>> blob_sum(123, 6) # 1 + 2 + 3 = 6\n    True\n    >>> blob_sum(123, 33) # digits of `n` must be read left-to-right\n    False\n    >>> blob_sum(123, 24) # 1 + 23 = 24\n    True\n    >>> blob_sum(123, 12) # every digit of `n` must be used\n    False\n    >>> blob_sum(123, 35) # every digit of `n` can only be used once\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "count_digits(n) from part (a) is predefined.",
+    "solution": "def blob_sum(n, k):\n    def helper(n, k, blob):\n        if n == 0:\n            return k == blob\n        if k <= 0:\n            return False\n        rest, last = n // 10, n % 10\n        new_blob = blob + (last * (10 ** count_digits(blob)))\n        return helper(rest, k - new_blob, 0) or helper(rest, k, new_blob)\n    return helper(n, k, 0)",
+    "explanation": "Digits are peeled off the right, so a growing blob gets each new digit placed in front of it: last * 10 ** count_digits(blob). At each digit, either close the blob (subtract it from k and start a fresh blob of 0) or keep growing it. When no digits are left, the pending blob must equal what remains of k. ",
+    "sol_uses": "Uses code provided by the exam: count_digits(n) from part (a) is predefined."
+   },
+   {
+    "qnum": "Q8(b)",
+    "title": "more_sold",
+    "header": "Q8(b) \u00a0more_sold Summer 2022 Midterm Q8(b) \u00b7 adapted: class attributes became parameters, and Boba and Coffee are data",
+    "text": [
+     "classes",
+     "more_sold takes a list of Boba items, a list of Coffee items and a dictionary all_items mapping each drink",
+     "name to the number sold. Return 'Boba' if more boba has been sold, 'Coffee' if more coffee has been sold,",
+     "and 'Neither' if sales are equal. (On the exam these were the class attributes Boba.all_boba,",
+     "Coffee.all_coffee and Item.all_items.)",
+     "",
+     ""
+    ],
+    "signature": "def more_sold(all_boba, all_coffee, all_items):\n    \"\"\"\n    >>> bubble_tea = Boba('Bubble Tea', 4, True, 'Tapioca pearls')\n    >>> black_coffee = Coffee('Black', 2, True)\n    >>> latte = Coffee('Latte', 4, True)\n    >>> all_items = {'Bubble Tea': 1, 'Black': 1, 'Latte': 1}\n    >>> more_sold([bubble_tea], [black_coffee, latte], all_items)\n    'Coffee'\n    \"\"\"",
+    "given": "",
+    "provided": "Boba(name, cost, in_stock, topping) and Coffee(name, cost, in_stock, temp='hot') are predefined data classes.",
+    "solution": "def more_sold(all_boba, all_coffee, all_items):\n    boba_names = [boba.name for boba in all_boba]\n    coffee_names = [coffee.name for coffee in all_coffee]\n    boba_total = [all_items[name] for name in boba_names]\n    coffee_total = [all_items[name] for name in coffee_names]\n    if sum(boba_total) > sum(coffee_total):\n        return 'Boba'\n    elif sum(coffee_total) > sum(boba_total):\n        return 'Coffee'\n    else:\n        return 'Neither'",
+    "explanation": "First collect the names with attribute lookup (boba.name), then look each name up in the dictionary to get its count, then compare the sums. Iterating over a dictionary gives its keys, which is why all_items if name in boba_names also works for blank (f).",
+    "sol_uses": "classes Uses code provided by the exam: Boba(name, cost, in_stock, topping) and Coffee(name, cost, in_stock, temp='hot') are predefined data classes."
+   }
+  ]
+ },
+ {
+  "id": "su23",
+  "term": "Summer 2023",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "digit_widget",
+    "header": "Q3(a) \u00a0digit_widget Summer 2023 Midterm Q3(a)",
+    "text": [
+     "Implement the recursive version of digit_widget, which takes digit d. It returns a function with positive",
+     "integer parameter n that removes all instances of d from n. You may not use str, repr, [, ] or for.",
+     ""
+    ],
+    "signature": "def digit_widget(d):\n    \"\"\"\n    Given a digit D, returns a function which accepts positive integer N that removes\n    all instances of D from N. If there are no digits remaining in N, return 0.\n    >>> remove_5s = digit_widget(5)\n    >>> remove_5s(1234512345)\n    12341234\n    >>> remove_5s(55555)\n    0\n    >>> remove_0s = digit_widget(0)\n    >>> remove_0s(102001)\n    121\n    >>> remove_0s(900)\n    9\n    >>> remove_0s(0)\n    0\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def digit_widget(d):\n    def remove_digit(n):\n        if n == 0:\n            return 0\n        if n % 10 == d:\n            return remove_digit(n // 10)\n        return remove_digit(n // 10) * 10 + n % 10\n    return remove_digit",
+    "explanation": "Look at the last digit. If it is d, drop it and recurse on the rest. Otherwise keep it: shift the cleaned-up rest one place left (* 10) and add the last digit back. The outer function returns the inner function itself, not a call to it.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "digit_widget_iter",
+    "header": "Q3(b) \u00a0digit_widget_iter Summer 2023 Midterm Q3(b) \u00b7 blank (c) fixed: the published answer is missing parentheses",
+    "text": [
+     "Implement the iterative version, digit_widget_iter, which takes digit d. It returns a function with positive",
+     "integer parameter n that removes all instances of d from n. You may not use str, repr, [, ] or for. Hint:",
+     "pow(b, n) raises b to the power of n.",
+     "",
+     ""
+    ],
+    "signature": "def digit_widget_iter(d):\n    \"\"\"\n    Given a digit D, returns a function which accepts positive integer N that removes\n    all instances of D from N. If there are no digits remaining in N, return 0.\n    >>> remove_5s = digit_widget_iter(5)\n    >>> remove_5s(1234512345)\n    12341234\n    >>> remove_5s(55555)\n    0\n    >>> remove_0s = digit_widget_iter(0)\n    >>> remove_0s(102001)\n    121\n    >>> remove_0s(900)\n    9\n    >>> remove_0s(0)\n    0\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def digit_widget_iter(d):\n    def remove_digit(n):\n        result, i = 0, 0\n        while n > 0:\n            if n % 10 != d:\n                result += pow(10, i) * (n % 10)\n                i += 1\n            n = n // 10\n        return result\n    return remove_digit",
+    "explanation": "Kept digits are placed into result from the ones place upward, so i counts how many digits have been kept and only advances when a digit is kept. n loses its last digit every time. The published answer pow(10, i) * n % 10 parses as (pow(10, i) * n) % 10, which is 0 once i is 1, so the parentheses around n % 10 matter.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(c)",
+    "title": "digit_machine",
+    "header": "Q3(c) \u00a0digit_machine Summer 2023 Midterm Q3(c)",
+    "text": [
+     "Implement digit_machine, which takes a positive integer n. It returns n with all instances of 4 and 8",
+     "removed. You may not use str, repr, [, ] or for. You may use digit_widget.",
+     ""
+    ],
+    "signature": "def digit_machine(n):\n    \"\"\"\n    Given an integer N, return a modified N such that all instances of 4 and 8 have been removed.\n    >>> digit_machine(484848)\n    0\n    >>> digit_machine(123456789)\n    1235679\n    >>> digit_machine(208)\n    20\n    \"\"\"",
+    "given": "",
+    "provided": "digit_widget(d) from part (a) is predefined.",
+    "solution": "def digit_machine(n):\n    return digit_widget(4)(digit_widget(8)(n))",
+    "explanation": "digit_widget(8) is a function, so call it on n to remove the 8s, then pass that result to the function digit_widget(4). The order of the two removals does not matter. ",
+    "sol_uses": "Uses code provided by the exam: digit_widget(d) from part (a) is predefined."
+   },
+   {
+    "qnum": "Q4",
+    "title": "goatda",
+    "header": "Q4 \u00a0goatda Summer 2023 Midterm Q4 \u00b7 adapted: the multiple-choice fix for line 3 is now a typed blank",
+    "text": [
+     "goatda takes a one-argument function lamb and a non-negative integer n. It returns a one-argument function",
+     "that applies lamb to its argument n times. The exam's buggy line 3 was return lambda x:",
+     "lamb(goatda(lamb, n-1)), so add3(10) raised a TypeError. Lines 1 and 2 are correct; rewrite line 3.",
+     ""
+    ],
+    "signature": "def goatda(lamb, n):\n    \"\"\"\n    Implement goatda which accepts LAMB, a single argument function, and N the number of times\n    to apply LAMB. Return a single argument function that applies LAMB to the argument N times.\n    >>> add3 = goatda(lambda x: x+1, 3)\n    >>> add3(10) # (((10 + 1) + 1) + 1)\n    13\n    >>> add3(2) # (((2 + 1) + 1) + 1)\n    5\n    >>> print2 = goatda(print, 2)\n    >>> print2(\"hi\") # print(print(\"hi\"))\n    hi\n    None\n    >>> identity = goatda(lambda x: x+3, 0) # The function is applied 0 times\n    >>> identity(0)\n    0\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def goatda(lamb, n):\n    if n == 0:\n        return lambda x: x\n    return lambda x: lamb(goatda(lamb, n-1)(x))",
+    "explanation": "goatda(lamb, n-1) is a function, not a number, so the buggy line passed a function to lamb. Call it on x first (apply lamb n - 1 times), then apply lamb once more.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(a)",
+    "title": "donut_tower",
+    "header": "Q5(a) \u00a0donut_tower Summer 2023 Midterm Q5(a)",
+    "text": [
+     "Implement donut_tower, which takes the number of donuts n and a positive integer k. It returns the number",
+     "of layers one can fill using n donuts, given the smallest layer has k donuts and each subsequent layer has one",
+     "more donut than the previous one. For instance, if n is 16 and k is 2, you can build 4 layers using 14 donuts.",
+     ""
+    ],
+    "signature": "def donut_tower(n, k):\n    \"\"\"\n    Given non-zero numbers N and K, returns the number of donut layers\n    that can be formed using N donuts and K-donut smallest layer\n    >>> donut_tower(0, 3)\n    0\n    >>> donut_tower(1, 1)\n    1\n    >>> donut_tower(10, 2) # 2 + 3 + 4 = 9 donuts\n    3\n    >>> donut_tower(20, 3) # 3 + 4 + 5 + 6 = 18 donuts\n    4\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def donut_tower(n, k):\n    if n < k:\n        return 0\n    else:\n        return 1 + donut_tower(n - k, k + 1)",
+    "explanation": "If there are fewer donuts than the next layer needs, no more layers fit. Otherwise build one layer of k donuts and recurse with k fewer donuts and a layer one bigger.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(b)",
+    "title": "alternating_tower",
+    "header": "Q5(b) \u00a0alternating_tower Summer 2023 Midterm Q5(b)",
+    "text": [
+     "Implement alternating_tower, which takes b brownies, c cupcakes and k, the size of the smallest layer in",
+     "donuts. A k-sized layer holds 3*k brownies or 2*k cupcakes, and each layer is one size bigger than the one",
+     "before. Layers alternate between brownies and cupcakes, and the first layer is always brownies. Return the",
+     "maximum number of layers.",
+     ""
+    ],
+    "signature": "def alternating_tower(b, c, k):\n    \"\"\"\n    >>> alternating_tower(5, 4, 1) # 1st layer has 3 brownies, 2nd layer has 4 cupcakes\n    2\n    >>> alternating_tower(10, 15, 3) # 1st layer has 9 brownies, 2nd layer has 8 cupcakes\n    2\n    >>> alternating_tower(16, 6, 5) # 1st layer has 15 brownies\n    1\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def alternating_tower(b, c, k):\n    def helper(b_item, c_item, curr_layer, is_cupcakes):\n        if b_item < 0 or c_item < 0:\n            return 0\n        elif is_cupcakes:\n            return 1 + helper(b_item, c_item - 2 * curr_layer, curr_layer + 1, not is_cupcakes)\n        else:\n            return 1 + helper(b_item - 3 * curr_layer, c_item, curr_layer + 1, not is_cupcakes)\n    return helper(b - 3 * k, c, k + 1, True)",
+    "explanation": "The helper is always called after subtracting the previous layer, so a negative count means that layer did not fit (return 0), and the 1 + in each branch counts the previous layer, which did fit. The extra parameter is_cupcakes flips each call to force alternation, and the first brownie layer is subtracted in the initial call, which is why it starts at k + 1 with cupcakes next. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q5(c)",
+    "title": "sweetest_tower",
+    "header": "Q5(c) \u00a0sweetest_tower Summer 2023 Midterm Q5(c)",
+    "text": [
+     "Implement sweetest_tower, which takes b brownies, c cupcakes and k, the size of the smallest layer. A k-",
+     "sized layer holds 3*k brownies or 2*k cupcakes, and each layer is one size bigger than the one before. Unlike",
+     "alternating_tower, layers can be in any order. Return the maximum number of layers.",
+     ""
+    ],
+    "signature": "def sweetest_tower(b, c, k):\n    \"\"\"\n    >>> sweetest_tower(0, 2, 1) # 1st layer with 2 cupcakes\n    1\n    >>> sweetest_tower(5, 4, 4)\n    0\n    >>> sweetest_tower(17, 19, 3) # layer 1 has 6 cupcakes, 2nd has 8 cupcakes, 3rd has 15 brownies\n    3\n    >>> sweetest_tower(30, 8, 4) # 1st layer has 12 brownies, 2nd has 15 brownies\n    2\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def sweetest_tower(b, c, k):\n    with_brownies, with_cupcakes = 0,0\n    if b >= 3 * k:\n        with_brownies = 1 + sweetest_tower(b - 3 * k, c, k + 1)\n    if c >= 2 * k:\n        with_cupcakes = 1 + sweetest_tower(b, c - 2*k, k + 1)\n    return max(with_brownies, with_cupcakes)",
+    "explanation": "Tree recursion with two choices for the current layer: brownies (if at least 3*k remain) or cupcakes (if at least 2*k remain). Each choice counts one layer and recurses with the next size. A choice that does not fit stays at 0, and max picks the better choice.",
+    "sol_uses": ""
+   }
+  ]
+ },
+ {
+  "id": "su24",
+  "term": "Summer 2024",
+  "questions": [
+   {
+    "qnum": "Q4(a)",
+    "title": "add_consecutive (iterative)",
+    "header": "Q4(a) \u00a0add_consecutive (iterative) Summer 2024 Midterm Q4(a)",
+    "text": [
+     "Implement add_consecutive iteratively. It takes a positive integer n and returns a list where each element is",
+     "the sum of a group of adjacent digits that are consecutive (differ by exactly 1; equal digits are not",
+     "consecutive). You may not use str, repr or for, and may not index with square brackets.",
+     "",
+     "",
+     ""
+    ],
+    "signature": "def add_consecutive(n):\n    \"\"\"\n    >>> add_consecutive(123456789)\n    [45]\n    >>> add_consecutive(567231) # [5 + 6 + 7, 2 + 3, 1]\n    [18, 5, 1]\n    >>> add_consecutive(111) # repeated digits are not consecutive\n    [1, 1, 1]\n    >>> add_consecutive(1235689)\n    [6, 11, 17]\n    >>> add_consecutive(3216598)\n    [6, 11, 17]\n    >>> add_consecutive(13579)\n    [1, 3, 5, 7, 9]\n    >>> add_consecutive(12321) # [1 + 2 + 3 + 2 + 1]\n    [9]\n    >>> add_consecutive(4)\n    [4]\n    >>> add_consecutive(105)\n    [1, 5]\n    >>> add_consecutive(135797531)\n    [1, 3, 5, 7, 9, 7, 5, 3, 1]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def add_consecutive(n):\n    result = []\n    subtotal = 0\n    while n >= 10:\n        rest, last = n // 10, n % 10\n        subtotal = subtotal + last\n        if abs((rest % 10) - last) != 1:\n            result = [subtotal] + result\n            subtotal = 0\n        n = rest\n    result = [subtotal + n] + result\n    return result",
+    "explanation": "Digits are read from the right, so each finished group is put at the front with [subtotal] + result to keep left-to-right order. A group ends when the next digit to the left (rest % 10) is not consecutive with last, and then the running subtotal resets to 0. The loop stops while one digit is left, and that leftmost digit always belongs to the current group, hence [subtotal + n] + result.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "add_consecutive (recursive)",
+    "header": "Q4(b) \u00a0add_consecutive (recursive) Summer 2024 Midterm Q4(b)",
+    "text": [
+     "Implement add_consecutive recursively (same behaviour as part (a)): each element of the returned list is",
+     "the sum of a group of adjacent digits of n that differ by exactly 1. You may not use str, repr or for, and may",
+     "not index with square brackets.",
+     "",
+     "",
+     ""
+    ],
+    "signature": "def add_consecutive(n):\n    \"\"\"\n    >>> add_consecutive(123456789)\n    [45]\n    >>> add_consecutive(567231) # [5 + 6 + 7, 2 + 3, 1]\n    [18, 5, 1]\n    >>> add_consecutive(111) # repeated digits are not consecutive\n    [1, 1, 1]\n    >>> add_consecutive(1235689)\n    [6, 11, 17]\n    >>> add_consecutive(3216598)\n    [6, 11, 17]\n    >>> add_consecutive(13579)\n    [1, 3, 5, 7, 9]\n    >>> add_consecutive(12321) # [1 + 2 + 3 + 2 + 1]\n    [9]\n    >>> add_consecutive(4)\n    [4]\n    >>> add_consecutive(105)\n    [1, 5]\n    >>> add_consecutive(135797531)\n    [1, 3, 5, 7, 9, 7, 5, 3, 1]\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def add_consecutive(n):\n    def helper(n, subtotal):\n        rest, last = n // 10, n % 10\n        subtotal = subtotal + last\n        if n < 10:\n            return [subtotal]\n        if abs((rest % 10) - last) == 1:\n            return helper(rest, subtotal)\n        else:\n            return helper(rest, 0) + [subtotal]\n    return helper(n, 0)",
+    "explanation": "subtotal is the running sum of the current group, built from the right. If the next digit to the left is consecutive, the group continues, so recurse with the subtotal carried along. Otherwise the group is finished: start a fresh group on rest and put this subtotal after everything to its left. On a single digit, the group ends there. ",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q6",
+    "title": "multi_compose",
+    "header": "Q6 \u00a0multi_compose Summer 2024 Midterm Q6 \u00b7 adapted: the doctest that displayed Function now checks callable(...)",
+    "text": [
+     "Implement multi_compose, which takes a list of one-argument functions funcs and integers x != y. It",
+     "returns a function that maps x to y by applying a subsequence of funcs in list order (each used 0 or 1 times),",
+     "or None if there is none. Any valid answer may be returned. Your solution must use safe_compose.",
+     "",
+     ""
+    ],
+    "signature": "def multi_compose(funcs, x, y):\n    \"\"\"\n    >>> add_one, double = lambda x: x + 1, lambda x: x * 2\n    >>> sub_three, square = lambda x: x - 3, lambda x: x ** 2\n    >>> list_of_funcs = [add_one, double, sub_three, square]\n    >>> double_then_square = multi_compose(list_of_funcs, 3, 36)\n    >>> callable(double_then_square)\n    True\n    >>> double_then_square(1) # (1 * 2) ** 2 --> 4\n    4\n    >>> square_then_double = multi_compose(list_of_funcs, 3, 18)\n    >>> square_then_double # None\n    >>> all_funcs = multi_compose(list_of_funcs, 3, 25)\n    >>> all_funcs(1) # (((1 + 1) * 2) - 3) ** 2 --> 1\n    1\n    >>> double = multi_compose(list_of_funcs, 50, 100)\n    >>> double(1) # 1 * 2 --> 2\n    2\n    >>> sub_two = multi_compose(list_of_funcs, 50, 48)\n    >>> sub_two(2) # 2 - 2 --> 0\n    0\n    >>> double_then_sub = multi_compose(list_of_funcs, 50, 97)\n    >>> double_then_sub(1) # (1 * 2) - 3 --> -1\n    -1\n    >>> negate = multi_compose(list_of_funcs, 100, -100)\n    >>> negate # None\n    \"\"\"",
+    "given": "",
+    "provided": "safe_compose(f, g) is predefined: it returns lambda x: f(g(x)), or None if either argument is None.",
+    "solution": "def multi_compose(funcs, x, y):\n    if x == y:\n        return lambda x: x\n    if not funcs:\n        return None\n    return safe_compose(multi_compose(funcs[1:], funcs[0](x), y), funcs[0]) or multi_compose(funcs[1:], x, y)",
+    "explanation": "When x already equals y, applying no more functions works, so return the identity function. With no functions left and x != y there is no answer. Otherwise first try using funcs[0]: find a composition of the rest that takes funcs[0](x) to y and apply it after funcs[0]; safe_compose gives None if that failed, so or falls through to skipping funcs[0].",
+    "sol_uses": "Uses code provided by the exam: safe_compose(f, g) is predefined: it returns lambda x: f(g(x)), or None if either argument is None."
+   }
+  ]
+ },
+ {
+  "id": "su25",
+  "term": "Summer 2025",
+  "questions": [
+   {
+    "qnum": "Q3(a)",
+    "title": "python",
+    "header": "Q3(a) \u00a0python Summer 2025 Midterm Q3(a) \u00b7 adapted: blank (e) lengths.insert/extend replaced by a non-mutating line",
+    "text": [
+     "A python is a run of the same digit d appearing at every other digit place (indices two apart). Implement",
+     "python, which takes n > 0 and a digit d and returns the length of the longest python of d in n.",
+     ""
+    ],
+    "signature": "def python(n, d):\n    \"\"\"\n    Return the length of the longest python of digit d in integer n.\n    >>> python(2125262, 2)      # positions of 2s: [0,2,4,6] -> all 2 apart -> length 4\n    4\n    >>> python(2020211202, 2)   # positions of 2s: [0,2,4,7,9] -> longest python is 3 (at 0,2,4)\n    3\n    >>> python(20211120202, 2)  # positions of 2s: [0,2,6,8,10] -> longest python is 3 (at 6,8,10)\n    3\n    >>> python(1010, 0)\n    2\n    >>> python(123456, 7)       # no 7 exists within n\n    0\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def python(n, d):\n    lengths = []\n    while n > 0:\n        copied_n = n\n        length = 0\n        while copied_n % 10 == d and copied_n > 0:\n            length += 1\n            copied_n = copied_n // 100\n        lengths = lengths + [length]\n        n = n // 10\n    return max(lengths)",
+    "explanation": "The outer loop tries every starting place by dropping one digit at a time from n; the inner loop works on a copy and jumps two places with // 100 while the last digit is still d. Each run length is recorded, and the answer is the largest one. The copied_n > 0 check stops the inner loop once the copy runs out of digits, which matters when d is 0.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q3(b)",
+    "title": "longest_python",
+    "header": "Q3(b) \u00a0longest_python Summer 2025 Midterm Q3(b) \u00b7 adapted: the loop that assigned d[python(n, x)] = x is now a",
+    "text": [
+     "dictionary comprehension",
+     "Implement longest_python, which takes n and returns a tuple of the digit with the longest python in n and",
+     "that length. If there is a tie, return the larger digit. Assume python from part (a) works.",
+     ""
+    ],
+    "signature": "def longest_python(n):\n    \"\"\"\n    Return the digit and length of the longest python for any digit d\n    If there is a tie, return the larger digit.\n    >>> longest_python(2324252)   # 2 has len 4, others have len 1\n    (2, 4)\n    >>> longest_python(1212121)   # 1 has len 4, 2 has len 3,\n    (1, 4)\n    >>> longest_python(56565656)  # 5 has len 4, 6 has len 4, 6 > 5\n    (6, 4)\n    >>> longest_python(67676565)  # 6 has len 4, 7 has len 2, 5 has len 2\n    (6, 4)\n    >>> longest_python(12345)     # all have len 1, return largest digit\n    (5, 1)\n    \"\"\"",
+    "given": "",
+    "provided": "python(n, d) from part (a) is predefined.",
+    "solution": "def longest_python(n):\n    d = {python(n, x): x for x in range(10)}\n    key = max(d)\n    return d[key], key",
+    "explanation": "The dictionary maps each python length to a digit. Digits are visited from 0 to 9, and a repeated key keeps its latest value, so for tied lengths the larger digit wins automatically. The longest length is max(d) (max over a dictionary looks at its keys), and the function returns the digit first and then that length. ",
+    "sol_uses": "dictionary comprehension Uses code provided by the exam: python(n, d) from part (a) is predefined."
+   },
+   {
+    "qnum": "Q4(a)",
+    "title": "is_valid",
+    "header": "Q4(a) \u00a0is_valid Summer 2025 Midterm Q4(a)",
+    "text": [
+     "A number is valid if it has 2 or fewer digits, or if every digit except the last two has another digit 1 or 2 places",
+     "to its right with the same parity. Implement is_valid for n > 0.",
+     ""
+    ],
+    "signature": "def is_valid(n):\n    \"\"\"\n    >>> is_valid(3412) # 1 is two digits to the right of 3, 2 is two digits to the right of 4.\n    True\n    >>> is_valid(43) # 2 or fewer digits\n    True\n    >>> is_valid(3443) # No odd number within two digits of leftmost 3.\n    False\n    >>> is_valid(213) # No even number to the right of 2.\n    False\n    \"\"\"",
+    "given": "",
+    "provided": "",
+    "solution": "def is_valid(n):\n    def helper(last, second, n):\n        if n == 0:\n            return True\n        curr = n % 10\n        if curr % 2 != last % 2 and curr % 2 != second % 2:\n            return False\n        return helper(second, curr, n // 10)\n    return helper(n % 10, n // 10 % 10, n // 100)",
+    "explanation": "The helper carries the two digits just to the right of the current one: second is one place right and last is two places right. A digit fails only if its parity differs from both of them. Then everything shifts one place left: the old second becomes last, the current digit becomes second and one digit is dropped from n.",
+    "sol_uses": ""
+   },
+   {
+    "qnum": "Q4(b)",
+    "title": "valid_subseq",
+    "header": "Q4(b) \u00a0valid_subseq Summer 2025 Midterm Q4(b) \u00b7 adapted: the nested reverse (body not shown on the exam) is",
+    "text": [
+     "predefined instead",
+     "A subsequence of a number keeps some (but not none) of its digits in order; for example 213 has",
+     "subsequences 2, 1, 3, 21, 23, 13, 213. Implement valid_subseq, which returns how many subsequences of n",
+     "are valid. Hint: True + True == 2.",
+     ""
+    ],
+    "signature": "def valid_subseq(n):\n    \"\"\"\n    Return the number of valid subsequences of n.\n    >>> valid_subseq(12) # possible subseqs: 1, 2, 12 - all are valid\n    3\n    >>> valid_subseq(123)\n    7\n    >>> valid_subseq(213) # possible subseqs: 2, 1, 3, 21, 23, 13, 213 - 6 of which are valid.\n    6\n    >>> valid_subseq(3412)\n    14\n    \"\"\"",
+    "given": "",
+    "provided": "is_valid from part (a) and reverse(x) (which reverses the digits of x, so reverse(3412) is 2143) are predefined.",
+    "solution": "def valid_subseq(n):\n    def helper(num, rest):\n        if num == 0 and rest == 0:\n            return 0\n        elif rest == 0:\n            return is_valid(num)\n        return helper(num * 10 + rest % 10, rest // 10) + helper(num, rest // 10)\n    return helper(0, reverse(n))",
+    "explanation": "num is the subsequence chosen so far and rest holds the remaining digits reversed, so rest % 10 is the next digit of n from the left. Each step either includes that digit (appending it to num with num * 10 + ...) or excludes it, and both counts are added. When no digits are left, the empty choice counts 0 and any other choice counts 1 exactly when is_valid(num) is True.",
+    "sol_uses": "predefined instead Uses code provided by the exam: is_valid from part (a) and reverse(x) (which reverses the digits of x, so reverse(3412) is 2143) are predefined."
+   }
+  ]
+ }
+]

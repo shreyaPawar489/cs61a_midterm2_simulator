@@ -1,0 +1,8 @@
+# Your personal progress (code, scores, exams)
+state.json
+state.json.tmp
+__pycache__/
+.DS_Store
+# Study guide PDFs you add locally
+study-guides/*
+!study-guides/.gitkeep

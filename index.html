@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CS 61A Midterm 2 Simulator</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+<style>
+  :root { --pl-navy: #11284b; --pl-blue: #0d6efd; }
+  body { background: #f4f5f7; font-size: 15px; }
+  .navbar-pl { background: var(--pl-navy); }
+  .navbar-pl .navbar-brand { font-weight: 600; letter-spacing: .2px; }
+  .navbar-pl .nav-link, .navbar-pl .navbar-text { color: #d6deea !important; }
+  .card { border-color: #d8dde6; }
+  .card-header { background: #e9edf3; font-weight: 600; }
+  pre, code, .CodeMirror { font-family: Menlo, Consolas, "DejaVu Sans Mono", monospace; font-size: 13.5px; }
+  pre.code { background: #f7f8fa; border: 1px solid #e1e5eb; border-radius: 4px; padding: 10px 12px; white-space: pre-wrap; margin: 0; }
+  .CodeMirror { height: auto; min-height: 340px; border: 1px solid #c9d0da; border-radius: 4px; }
+  .CodeMirror-scroll { min-height: 340px; }
+  textarea.fallback { width: 100%; min-height: 380px; font-family: Menlo, monospace; font-size: 13.5px; tab-size: 4; }
+  .timer { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .timer.low { color: #ffb3b3 !important; }
+  .test-row { border-top: 1px solid #e6e9ee; padding: 8px 0; }
+  .test-row:first-child { border-top: 0; }
+  .badge-score { font-size: .95rem; }
+  .q-nav a { text-decoration: none; }
+  .q-nav .active-q { font-weight: 700; }
+  .small-muted { color: #6c757d; font-size: .85rem; }
+  .instructions p { margin-bottom: .6rem; }
+  .table td, .table th { vertical-align: middle; }
+  .context { color: #8a94a3; }
+  pre.code.debug { background: #fffbe6; border-color: #f0e2a8; }
+  pre.code.fail-out { background: #fff5f5; border-color: #f3c7c7; }
+  pre.code.ok-out { background: #f3fbf5; border-color: #c4e6cd; }
+  .clickable { cursor: pointer; }
+  .locked-banner { background: #fff3cd; border: 1px solid #ffe08a; }
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand navbar-dark navbar-pl mb-3">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#/">PrairieLearn <span class="fw-normal opacity-75">· CS 61A Midterm 2 simulator</span></a>
+    <div class="navbar-nav me-auto">
+      <a class="nav-link" href="#/">Assessments</a>
+      <a class="nav-link" href="#/practice">Question bank</a>
+    </div>
+    <span class="navbar-text timer me-2" id="nav-timer"></span>
+    <button class="btn btn-sm btn-outline-light d-none" id="nav-pause">Pause</button>
+  </div>
+</nav>
+<main class="container-fluid px-4 pb-5" id="app"><div class="text-muted">Loading…</div></main>
+
+<script>
+'use strict';
+// ---------- state ----------
+let CATALOG = [], SCOPE = {topics: [], problems: []}, STATE = {exams: {}, practice: {}}, QCACHE = {}, editor = null, timerHandle = null, saveHandle = null;
+const MAX_CHECKS = 100, EXAM_MAX = 20, APLUS = 5;
+const DEFAULT_POINTS = [5, 6, 7, 8];  // 26 points total, like the real exam
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = sel => document.querySelector(sel);
+const api = async (url, body) => {
+  const r = await fetch(url, body === undefined ? {} : {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  return r.json();
+};
+const saveState = () => api('/api/state', STATE);
+const saveSoon = () => { clearTimeout(saveHandle); saveHandle = setTimeout(saveState, 600); };
+const getQ = async id => QCACHE[id] || (QCACHE[id] = await api('/api/question/' + id));
+const allQs = () => CATALOG.flatMap(e => e.questions.map(q => ({...q, exam: e.id, term: e.term})));
+const qMeta = id => allQs().find(q => q.id === id);
+// Every compiled past-paper question; a multi-part Ed problem replaces its separate parts.
+const examPool = () => allQs().filter(q => q.topic && !q.part_of);
+// Exam-mode label: function names only (no parenthetical hints about the source exam).
+const shortTitle = t => t.replace(/\s*\(.*?\)/g, '');
+const fmtPct = x => Math.round(x * 100) + '%';
+const badge = x => x == null ? '<span class="badge text-bg-secondary">—</span>'
+  : `<span class="badge ${x >= 1 ? 'text-bg-success' : x > 0 ? 'text-bg-warning' : 'text-bg-danger'}">${fmtPct(x)}</span>`;
+const round2 = x => Math.round(x * 100) / 100;
+
+// ---------- exam helpers ----------
+function workFor(container, qid) {
+  container.work = container.work || {};
+  return container.work[qid] || (container.work[qid] = {code: null, best: null, checks: 0, submissions: []});
+}
+function examTotals(ex) {
+  let raw = 0, all = true;
+  for (const q of ex.questions) {
+    const w = (ex.work || {})[q.qid];
+    const best = w && w.best != null ? w.best : 0;
+    raw += best * q.points;
+    if (best < 1) all = false;
+  }
+  const max = ex.maxScore, total = ex.questions.reduce((a, q) => a + q.points, 0);
+  return {raw: round2(raw), score: round2(Math.min(max, raw)), max, total, aplus: ex.aplus && all ? APLUS : 0};
+}
+// Not started yet, or untimed: the clock isn't running. Paused time doesn't count.
+const deadline = ex => ex.startedAt + ex.limitMin * 60000 + (ex.pausedMs || 0);
+const timeLeft = ex => ex.startedAt && ex.limitMin ? deadline(ex) - (ex.pausedAt || Date.now()) : Infinity;
+const isOpen = ex => !ex.finishedAt && timeLeft(ex) > 0;
+const canPause = ex => ex && ex.startedAt && ex.limitMin && isOpen(ex);
+function pauseExam(ex) {
+  if (!canPause(ex) || ex.pausedAt) return;
+  if (editor) { const qi = +location.hash.split('/')[4]; const qq = ex.questions[qi]; if (qq) workFor(ex, qq.qid).code = editor.getValue(); }
+  ex.pausedAt = Date.now(); saveState(); route();
+}
+function resumeExam(ex) {
+  if (!ex.pausedAt) return;
+  ex.pausedMs = (ex.pausedMs || 0) + (Date.now() - ex.pausedAt); ex.pausedAt = null; saveState(); route();
+}
+function renderPaused(ex) {
+  $('#nav-timer').textContent = 'Paused · ' + fmtClock(timeLeft(ex)) + ' left';
+  $('#app').innerHTML = `<div class="card mx-auto text-center" style="max-width: 560px"><div class="card-header">${esc(ex.label)}</div><div class="card-body py-5">
+    <h4 class="mb-2">Exam paused</h4>
+    <p class="text-muted mb-1">The clock is stopped and the questions are hidden until you resume.</p>
+    <p class="mb-4">Time remaining: <b class="timer">${fmtClock(timeLeft(ex))}</b></p>
+    <button class="btn btn-primary btn-lg" id="resume">Resume exam</button></div></div>`;
+  $('#resume').onclick = () => resumeExam(ex);
+}
+function closeIfExpired(ex) {
+  if (!ex.finishedAt && timeLeft(ex) <= 0) { ex.finishedAt = deadline(ex); saveState(); }
+}
+function fmtClock(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), sec = s % 60;
+  return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(sec).padStart(2, '0');
+}
+
+// One question for each Midterm 2 topic from the Ed post (Recursion, Lists and Dictionaries,
+// Linked Lists), plus a fourth from any topic including Midterm 1 topics. All from different past exams.
+function newRandomExam(limitMin) {
+  const used = new Set(Object.values(STATE.exams).flatMap(e => e.questions.map(q => q.qid)));
+  const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
+  const fresh = q => !used.has(q.id);
+  const slots = shuffle(SCOPE.main_topics).concat([null]);
+  const tryPick = preferFresh => {
+    const picked = [];
+    for (const topic of slots) {
+      const cands = shuffle(examPool().filter(q => (!topic || q.topic === topic)
+        && !picked.some(p => p.exam === q.exam) && (!preferFresh || fresh(q))));
+      if (!cands.length) return null;
+      picked.push(cands[0]);
+    }
+    return picked;
+  };
+  const picked = (tryPick(true) || tryPick(false)).sort((a, b) => a.size - b.size);
+  return makeExam('Mock Midterm 2', picked.map((q, i) => ({qid: q.id, points: DEFAULT_POINTS[i]})), limitMin, EXAM_MAX, true);
+}
+function newPaperExam(examId, limitMin) {
+  const e = CATALOG.find(x => x.id === examId);
+  const qs = e.questions.filter(q => !q.part_of).map(q => ({qid: q.id, points: 5}));
+  return makeExam(e.term + ' Midterm 2 (write-all-code)', qs, limitMin, qs.length * 5, false);
+}
+function makeExam(label, questions, limitMin, maxScore, aplus) {
+  const id = 'x' + Date.now().toString(36);
+  const n = Object.keys(STATE.exams).length + 1;
+  STATE.exams[id] = {id, label: `${label} #${n}`, questions, limitMin, maxScore, aplus, created: Date.now(), startedAt: null, finishedAt: null, work: {}};
+  saveState();
+  return id;
+}
+
+// ---------- routing ----------
+window.addEventListener('hashchange', route);
+async function route() {
+  clearInterval(timerHandle); $('#nav-timer').textContent = ''; editor = null;
+  $('#nav-pause').classList.add('d-none');
+  const parts = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  window.scrollTo(0, 0);
+  const ex = parts[0] === 'exam' && STATE.exams[parts[1]];
+  if (ex && ex.pausedAt && !ex.finishedAt) return renderPaused(ex);
+  if (parts[0] === 'exam' && parts[2] === 'q') return renderQuestion(STATE.exams[parts[1]], +parts[3]);
+  if (parts[0] === 'exam') return renderExamOverview(STATE.exams[parts[1]]);
+  if (parts[0] === 'practice' && parts[1] === 'q') return renderQuestion(null, parts[2]);
+  if (parts[0] === 'practice') return renderBank();
+  renderHome();
+}
+
+function startTimer(ex) {
+  const tick = () => {
+    const left = timeLeft(ex);
+    const el = $('#nav-timer'), side = $('#side-timer');
+    if (ex.finishedAt) { el.textContent = 'Exam closed'; if (side) side.textContent = 'Closed'; return; }
+    if (left === Infinity) { el.textContent = 'No time limit'; if (side) side.textContent = 'No time limit'; return; }
+    const txt = fmtClock(left);
+    el.textContent = 'Time remaining ' + txt; el.classList.toggle('low', left < 5 * 60000);
+    if (side) side.textContent = txt;
+    if (left <= 0) { closeIfExpired(ex); route(); }
+  };
+  const btn = $('#nav-pause');
+  btn.classList.toggle('d-none', !canPause(ex));
+  btn.onclick = () => pauseExam(ex);
+  tick(); timerHandle = setInterval(tick, 1000);
+}
+
+// ---------- pages ----------
+function renderHome() {
+  const exams = Object.values(STATE.exams).sort((a, b) => b.created - a.created);
+  const rows = exams.map(ex => {
+    closeIfExpired(ex);
+    const t = examTotals(ex);
+    const status = !ex.startedAt ? '<span class="badge text-bg-secondary">Not started</span>'
+      : ex.pausedAt && isOpen(ex) ? '<span class="badge text-bg-warning">Paused</span>'
+      : isOpen(ex) ? '<span class="badge text-bg-primary">Open</span>' : '<span class="badge text-bg-dark">Closed</span>';
+    return `<tr><td><a href="#/exam/${ex.id}">${esc(ex.label)}</a><div class="small-muted">${new Date(ex.created).toLocaleString()}</div></td>
+      <td>${status}</td><td>${ex.limitMin ? ex.limitMin + ' min' : 'none'}</td>
+      <td>${ex.startedAt ? `${t.score}/${t.max}` + (t.aplus ? ` <span class="badge text-bg-success">+${t.aplus} A+</span>` : '') : '—'}</td>
+      <td class="text-end"><button class="btn btn-sm btn-outline-danger" data-del="${ex.id}">Delete</button></td></tr>`;
+  }).join('');
+  const paperOpts = CATALOG.map(e => { const n = e.questions.filter(q => !q.part_of).length;
+    return `<option value="${e.id}">${esc(e.term)} (${n} question${n > 1 ? 's' : ''})</option>`; }).join('');
+  $('#app').innerHTML = `
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card"><div class="card-header">Assessments</div>
+        ${exams.length ? `<table class="table mb-0"><thead><tr><th>Assessment</th><th>Status</th><th>Time limit</th><th>Score</th><th></th></tr></thead><tbody>${rows}</tbody></table>`
+        : '<div class="card-body text-muted">No exams yet. Start a mock exam on the right.</div>'}
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card mb-4"><div class="card-header">Start a mock Midterm 2 (CBTF format)</div><div class="card-body">
+        <p class="mb-2">Four questions drawn from all ${examPool().length} compiled past-paper questions, using the Ed post's topics: one <b>recursion</b> question, one <b>lists and dictionaries</b> question, one <b>linked lists</b> question, and a fourth from any topic (Midterm 1 topics included). Each comes from a different past exam. Problems the Ed post lists with several parts (such as Q5(b)–(c)) count as one question, and you write every part. Questions are ordered from shortest to longest reference solution and are worth 5, 6, 7 and 8 points (26 total). Your score is capped at 20, and getting all four fully correct earns 5 A+ points. Problems from earlier mock exams are skipped until there aren't enough left.</p>
+        <div class="input-group mb-2" style="max-width: 320px"><span class="input-group-text">Time limit</span>
+          <input id="mock-min" type="number" min="0" class="form-control" value="${STATE.lastLimit ?? 60}"><span class="input-group-text">min</span></div>
+        <div class="small-muted mb-3">Use 0 for no time limit. Set this to your real CBTF slot length.</div>
+        <button class="btn btn-primary" id="new-mock">Create mock exam</button>
+      </div></div>
+      <div class="card"><div class="card-header">Or take one whole past paper</div><div class="card-body">
+        <select id="paper" class="form-select mb-2">${paperOpts}</select>
+        <div class="input-group mb-3" style="max-width: 320px"><span class="input-group-text">Time limit</span>
+          <input id="paper-min" type="number" min="0" class="form-control" value="0"><span class="input-group-text">min</span></div>
+        <button class="btn btn-outline-primary" id="new-paper">Create past-paper exam</button>
+      </div></div>
+    </div>
+  </div>`;
+  $('#new-mock').onclick = () => { const m = Math.max(0, +$('#mock-min').value || 0); STATE.lastLimit = m; location.hash = '#/exam/' + newRandomExam(m); };
+  $('#new-paper').onclick = () => { location.hash = '#/exam/' + newPaperExam($('#paper').value, Math.max(0, +$('#paper-min').value || 0)); };
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+    if (confirm('Delete this exam and all its submissions?')) { delete STATE.exams[b.dataset.del]; saveState(); renderHome(); }
+  });
+}
+
+function instructionsHTML(ex) {
+  const total = ex.questions.reduce((a, q) => a + q.points, 0), n = ex.questions.length;
+  const scoring = ex.aplus
+    ? `<p>The maximum possible score on this exam is ${ex.maxScore} points, but there are ${n} questions worth a total of ${total} points. Therefore, you do not need to answer all questions correctly in order to receive a perfect score of ${ex.maxScore}. Students who do answer all questions correctly will also earn ${APLUS} A+ points.</p>`
+    : `<p>There are ${n} question${n > 1 ? 's' : ''} worth a total of ${total} points.</p>`;
+  return `<div class="instructions">${scoring}
+    <p>Click each question below to complete it. Please do not change the provided function signatures. To check your answer(s) for each question, click the "Save &amp; Grade" button on the question page. You can check each question ${MAX_CHECKS} times, and there is no penalty for checking repeatedly.</p>
+    <p>To debug, you can call <code>print("DEBUG:")</code>. For example, to see the value of a variable <code>x</code>, you could write <code>print("DEBUG: x is", x)</code>.</p>
+    <p>If you see an error that reads <em>Your grading job did not complete within the time limit of 5 seconds.</em>, your code likely has an infinite loop.</p>
+    <p>When implementing functions, do not hardcode the solution for specific inputs to pass the test cases. Doing so will result in a 0 score. (Hidden test cases are run on every check.)</p>
+    <p class="mb-0">The following study guides are available to you on this exam: <span class="guides-list">Linked list reference</span></p></div>`;
+}
+
+async function renderExamOverview(ex) {
+  if (!ex) { location.hash = '#/'; return; }
+  closeIfExpired(ex);
+  if (!ex.startedAt) {
+    $('#app').innerHTML = `<div class="card mx-auto" style="max-width: 900px"><div class="card-header">${esc(ex.label)}</div><div class="card-body">
+      ${instructionsHTML(ex)}<hr>
+      <p class="mb-3"><b>Time limit:</b> ${ex.limitMin ? ex.limitMin + ' minutes' : 'none'}. The timer starts when you click Start, and the exam closes on its own when time runs out.</p>
+      <button class="btn btn-primary btn-lg" id="start">Start assessment</button></div></div>`;
+    fillGuides();
+    $('#start').onclick = () => { ex.startedAt = Date.now(); saveState(); route(); };
+    return;
+  }
+  const t = examTotals(ex), open = isOpen(ex);
+  const rows = ex.questions.map((q, i) => {
+    const w = (ex.work || {})[q.qid] || {};
+    const m = qMeta(q.qid);
+    const title = open ? `Question ${i + 1}: <code>${esc(shortTitle(m.title))}</code>` : `Question ${i + 1}: <code>${esc(m.title)}</code> <span class="small-muted">(${esc(m.term)} ${esc(m.qnum)})</span>`;
+    return `<tr><td><a href="#/exam/${ex.id}/q/${i}">${title}</a></td><td>${q.points}</td>
+      <td>${badge(w.best)}</td><td>${round2((w.best || 0) * q.points)}/${q.points}</td><td>${w.checks || 0}/${MAX_CHECKS}</td></tr>`;
+  }).join('');
+  $('#app').innerHTML = `<div class="row g-4"><div class="col-lg-8">
+    ${!open ? `<div class="locked-banner rounded p-3 mb-3"><b>This assessment is closed.</b> Your answers are locked. Open a question to review your submissions and the reference solution.</div>` : ''}
+    <div class="card mb-4"><div class="card-header d-flex justify-content-between"><span>${esc(ex.label)}</span><span>Total points: ${t.score}/${t.max}${t.aplus ? ` · <span class="text-success">+${t.aplus} A+</span>` : ''}</span></div>
+      <table class="table mb-0"><thead><tr><th>Question</th><th>Value</th><th>Best submission</th><th>Awarded points</th><th>Checks used</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="card"><div class="card-header">Instructions</div><div class="card-body">${instructionsHTML(ex)}</div></div>
+  </div><div class="col-lg-4">
+    <div class="card mb-3"><div class="card-header">Assessment</div><div class="card-body">
+      <div class="d-flex justify-content-between"><span>Time remaining</span><span class="timer" id="side-timer"></span></div>
+      <div class="d-flex justify-content-between"><span>Points (capped at ${t.max})</span><b>${t.score}/${t.max}</b></div>
+      ${ex.aplus ? `<div class="d-flex justify-content-between"><span>Raw points</span><span>${t.raw}/${t.total}</span></div>
+      <div class="d-flex justify-content-between"><span>A+ points</span><span>${t.aplus}/${APLUS}</span></div>` : ''}
+      ${canPause(ex) ? '<button class="btn btn-outline-secondary w-100 mt-3" id="pause">Pause exam</button>' : ''}
+      ${open ? '<button class="btn btn-danger w-100 mt-2" id="finish">Finish assessment</button>' : ''}
+    </div></div>
+    ${guidesCard()}
+  </div></div>`;
+  fillGuides();
+  startTimer(ex);
+  if (canPause(ex)) $('#pause').onclick = () => pauseExam(ex);
+  if (open) $('#finish').onclick = () => {
+    if (confirm('Finish the assessment? You will not be able to change your answers.')) { ex.finishedAt = Date.now(); ex.pausedAt = null; saveState(); route(); }
+  };
+}
+
+function guidesCard() {
+  return `<div class="card"><div class="card-header">Study guides</div><div class="card-body guides-list small"></div></div>`;
+}
+async function fillGuides() {
+  const files = await api('/api/guides');
+  const links = [`<a href="#" class="ll-ref">Linked list reference</a>`]
+    .concat(files.map(f => `<a href="/guides/${encodeURIComponent(f)}" target="_blank">${esc(f.replace(/\.(pdf|html)$/i, ''))}</a>`));
+  document.querySelectorAll('.guides-list').forEach(el => {
+    el.innerHTML = links.join(el.tagName === 'SPAN' ? ', ' : '<br>') +
+      (files.length || el.tagName === 'SPAN' ? '' : `<div class="small-muted mt-2">Put your Midterm 1 and Midterm 2 study guide PDFs in <code>practice-env/study-guides/</code> and they will show up here.</div>`);
+  });
+  document.querySelectorAll('.ll-ref').forEach(a => a.onclick = e => { e.preventDefault(); showLinkRef(); });
+}
+function showLinkRef() {
+  const w = window.open('', '_blank', 'width=640,height=520');
+  w.document.write(`<title>Linked list reference</title><pre style="font: 14px Menlo, monospace; padding: 12px">@dataclass
+class Link[T]:
+    first: T
+    rest: LinkedList[T] = ()  # empty list
+    def __str__(self):
+        return format_link(self)
+
+type LinkedList[T] = Link[T] | tuple[()]
+
+>>> s = Link(3, Link(4, Link(5)))
+>>> print(s)          # (3 4 5)
+>>> s.rest.rest       # Link(first=5, rest=())
+>>> s.rest.rest.rest  # ()
+
+Check isinstance(s, Link) (or s == ()) before using
+s.first or s.rest. There is no indexing and no len
+on a linked list.</pre>`);
+}
+
+function renderBank() {
+  const p = STATE.practice || {};
+  const pool = examPool();
+  const solved = pool.filter(q => (p[q.id] || {}).best === 1).length;
+  const edRank = Object.fromEntries(SCOPE.problems.map((s, i) => [s.id, i]));
+  const order = q => q.ed ? edRank[q.id] : 1000 + CATALOG.findIndex(e => e.id === q.exam);
+  const cards = SCOPE.topics.map(t => {
+    const qs = pool.filter(q => q.topic === t).sort((a, b) => order(a) - order(b));
+    const items = qs.map(q => { const w = p[q.id] || {};
+      const label = `${q.ed ? '★ ' : ''}${esc(q.term)} ${esc(q.qnum)}${q.ed_title ? ` “${esc(q.ed_title)}”` : ''}`;
+      const sub = (q.blurb ? esc(q.blurb) + ' · ' : '') + `<code>${esc(q.title)}</code>`;
+      return `<li class="list-group-item d-flex justify-content-between align-items-center"><div><a href="#/practice/q/${q.id}">${label}</a><div class="small-muted">${sub}</div></div>${w.best != null ? badge(w.best) : ''}</li>`;
+    }).join('');
+    return `<div class="col-lg-6 col-xxl-3"><div class="card h-100"><div class="card-header d-flex justify-content-between"><span>${esc(t)}</span><span class="fw-normal small-muted">${qs.length} questions</span></div>
+      <ul class="list-group list-group-flush">${items}</ul></div></div>`;
+  }).join('');
+  $('#app').innerHTML = `<div class="d-flex justify-content-between align-items-baseline mb-1"><h4 class="mb-0">Question bank</h4>
+    <span class="text-muted">${solved}/${pool.length} solved · no timer, solutions available</span></div>
+    <p class="text-muted">Every compiled past-paper question, grouped by the Ed post's Midterm 2 topics. ★ marks problems the Ed post recommends; they're listed first.</p>
+    <div class="row g-3">${cards}</div>`;
+}
+
+// ---------- question page ----------
+async function renderQuestion(ex, ref) {
+  let qid, points = null, container, idx = null;
+  if (ex) {
+    if (!ex.startedAt) { location.hash = '#/exam/' + ex.id; return; }
+    closeIfExpired(ex);
+    idx = ref; qid = ex.questions[idx].qid; points = ex.questions[idx].points; container = ex;
+  } else {
+    qid = ref; STATE.practice = STATE.practice || {}; container = {work: STATE.practice};
+  }
+  const q = await getQ(qid);
+  const w = workFor(container, qid);
+  const locked = ex && !isOpen(ex);
+  const examOpen = ex && !locked;
+  const heading = examOpen ? `Question ${idx + 1}` : ex ? `Question ${idx + 1} · ${esc(q.term)} ${esc(q.qnum)}` : `${esc(q.term)} ${esc(q.qnum)}`;
+  const left = MAX_CHECKS - w.checks;
+
+  const nav = ex ? `<div class="card mb-3"><div class="card-header">${esc(ex.label)}</div><div class="card-body q-nav">
+      <a href="#/exam/${ex.id}">← Assessment overview</a><hr class="my-2">
+      ${ex.questions.map((qq, i) => { const ww = (ex.work || {})[qq.qid] || {};
+        return `<div class="d-flex justify-content-between"><a href="#/exam/${ex.id}/q/${i}" class="${i === idx ? 'active-q' : ''}">Question ${i + 1}</a><span>${badge(ww.best)}</span></div>`; }).join('')}
+      <hr class="my-2"><div class="d-flex justify-content-between"><span>Time remaining</span><span class="timer" id="side-timer"></span></div>
+    </div></div>` : `<div class="card mb-3"><div class="card-body"><a href="#/practice">← Question bank</a></div></div>`;
+  const pointsCard = `<div class="card mb-3"><div class="card-header">Question</div><div class="card-body">
+      ${points != null ? `<div class="d-flex justify-content-between"><span>Value</span><span>${points} pts</span></div>
+      <div class="d-flex justify-content-between"><span>Awarded points</span><b>${round2((w.best || 0) * points)}/${points}</b></div>` : ''}
+      <div class="d-flex justify-content-between"><span>Best score</span><span>${badge(w.best)}</span></div>
+      <div class="d-flex justify-content-between"><span>Checks remaining</span><span>${left}/${MAX_CHECKS}</span></div>
+      <div class="d-flex justify-content-between"><span>Tests</span><span>${q.n_visible} visible + ${q.n_hidden} hidden</span></div>
+    </div></div>`;
+
+  $('#app').innerHTML = `<div class="row g-4"><div class="col-xl-9 col-lg-8">
+    ${locked ? `<div class="locked-banner rounded p-3 mb-3"><b>This assessment is closed.</b> Your answer is shown read-only, with the reference solution below.</div>` : ''}
+    <div class="card mb-3"><div class="card-header d-flex justify-content-between"><span>${heading}: <code>${esc(examOpen ? shortTitle(q.title) : q.title)}</code>${!examOpen && q.topic ? ` <span class="small-muted fw-normal">· ${esc(q.topic)}${q.ed_title ? ` · ★ Ed post: “${esc(q.ed_title)}”` : ''}</span>` : ''}</span>${points != null ? `<span>${points} points</span>` : ''}</div>
+      <div class="card-body">
+        ${q.paragraphs.map(p => `<p>${esc(p)}</p>`).join('')}
+        ${!examOpen && q.note ? `<p class="small-muted">Note: ${esc(q.note)}</p>` : ''}
+        ${q.provided_text ? `<div class="alert alert-info py-2"><b>Provided:</b> ${esc(q.provided_text)}</div>` : ''}
+        ${q.given ? `<div class="mb-3"><div class="fw-semibold mb-1">Given (already defined, do not rewrite):</div><pre class="code">${esc(q.given)}</pre></div>` : ''}
+        <div class="fw-semibold mb-1">Your answer</div>
+        <div id="editor-wrap"></div>
+        <div class="d-flex gap-2 mt-3 align-items-center flex-wrap">
+          <button class="btn btn-primary" id="grade" ${locked || left <= 0 ? 'disabled' : ''}>Save &amp; Grade</button>
+          <button class="btn btn-outline-secondary" id="save" ${locked ? 'disabled' : ''}>Save only</button>
+          <button class="btn btn-outline-secondary ms-auto" id="reset" ${locked ? 'disabled' : ''}>Reset to template</button>
+          ${!ex ? '<button class="btn btn-outline-success" id="show-sol">Show solution</button>' : ''}
+        </div>
+        <div class="small-muted mt-2" id="save-status">${left} of ${MAX_CHECKS} checks remaining · Tab inserts 4 spaces</div>
+      </div></div>
+    <div id="results"></div>
+    <div id="solution"></div>
+  </div><div class="col-xl-3 col-lg-4">${nav}${pointsCard}${guidesCard()}</div></div>`;
+  fillGuides();
+  if (ex) startTimer(ex);
+
+  const initial = w.code ?? q.signature + '\n';
+  if (window.CodeMirror) {
+    editor = CodeMirror($('#editor-wrap'), {
+      value: initial, mode: 'python', lineNumbers: true, indentUnit: 4, tabSize: 4, matchBrackets: true, readOnly: locked,
+      extraKeys: {Tab: cm => cm.somethingSelected() ? cm.indentSelection('add') : cm.replaceSelection('    ', 'end'),
+                  'Shift-Tab': cm => cm.indentSelection('subtract'),
+                  'Cmd-Enter': () => $('#grade').click(), 'Ctrl-Enter': () => $('#grade').click(),
+                  'Cmd-S': () => $('#save').click(), 'Ctrl-S': () => $('#save').click()}
+    });
+    editor.on('change', () => { if (!locked) { w.code = editor.getValue(); saveSoon(); } });
+  } else {
+    $('#editor-wrap').innerHTML = `<textarea class="fallback" spellcheck="false" ${locked ? 'readonly' : ''}></textarea>`;
+    const ta = $('#editor-wrap textarea'); ta.value = initial;
+    ta.onkeydown = e => { if (e.key === 'Tab') { e.preventDefault(); ta.setRangeText('    ', ta.selectionStart, ta.selectionEnd, 'end'); } };
+    ta.oninput = () => { w.code = ta.value; saveSoon(); };
+    editor = {getValue: () => ta.value, setValue: v => { ta.value = v; }};
+  }
+
+  const showLatest = () => { if (w.submissions.length) renderResults(w.submissions[w.submissions.length - 1], w.submissions.length); };
+  showLatest();
+  if (locked) showSolution(qid);
+
+  $('#save').onclick = async () => { w.code = editor.getValue(); await saveState(); $('#save-status').textContent = 'Saved at ' + new Date().toLocaleTimeString(); };
+  $('#reset').onclick = () => { if (confirm('Replace your code with the original template?')) editor.setValue(q.signature + '\n'); };
+  if (!ex) $('#show-sol').onclick = () => showSolution(qid);
+  $('#grade').onclick = async () => {
+    if (ex && (!isOpen(ex) || ex.pausedAt)) { route(); return; }
+    if (w.checks >= MAX_CHECKS) return;
+    const btn = $('#grade'); btn.disabled = true; btn.textContent = 'Grading…';
+    w.code = editor.getValue();
+    const report = await api('/api/grade', {id: qid, code: w.code});
+    w.checks += 1;
+    const sub = {at: Date.now(), score: report.score, report};
+    w.submissions.push(sub);
+    if (w.submissions.length > 5) w.submissions.forEach((s, i) => { if (i < w.submissions.length - 5) delete s.report; });
+    w.best = Math.max(w.best ?? 0, report.score);
+    await saveState();
+    // Re-render the sidebar numbers but keep the editor and scroll position.
+    const y = window.scrollY; await renderQuestion(ex, ref); window.scrollTo(0, y);
+    document.getElementById('results').scrollIntoView({behavior: 'smooth', block: 'start'});
+  };
+}
+
+function renderResults(sub, n) {
+  const r = sub.report;
+  if (!r) return;
+  let body;
+  if (r.timeout) body = `<div class="alert alert-danger mb-0">Your grading job did not complete within the time limit of 5 seconds.</div>`;
+  else if (r.crash) body = `<div class="alert alert-danger">The grader crashed.</div><pre class="code fail-out">${esc(r.crash)}</pre>`;
+  else if (r.setup_error) body = `<div class="alert alert-danger mb-2">Your code raised an error before any test ran, so no tests passed.</div><pre class="code fail-out">${esc(r.setup_error)}</pre>`
+      + (r.debug ? `<div class="mt-2 fw-semibold">Output</div><pre class="code debug">${esc(r.debug)}</pre>` : '');
+  else {
+    const tests = r.tests.map(t => {
+      const prompt = s => s.split('\n').map((l, i) => (i ? '... ' : '>>> ') + l).join('\n');
+      const ctx = !t.hidden && !t.passed && t.context && t.context.length
+        ? `<span class="context">${esc(t.context.map(prompt).join('\n'))}\n</span>` : '';
+      const src = ctx + esc(t.hidden ? t.source : prompt(t.source));
+      const detail = t.passed ? '' : `<div class="row g-2 mt-1"><div class="col-md-6"><div class="small-muted">Expected</div><pre class="code ok-out">${esc(t.expected || '(nothing)')}</pre></div>
+        <div class="col-md-6"><div class="small-muted">Your code produced</div><pre class="code fail-out">${esc(t.got || '(nothing)')}</pre></div></div>`;
+      return `<div class="test-row"><div class="d-flex justify-content-between align-items-start">
+          <div class="me-2"><span class="fw-semibold">${t.passed ? '✅' : '❌'} ${esc(t.name)}</span>${t.hidden ? ' <span class="badge text-bg-light border">hidden</span>' : ''}</div></div>
+        <pre class="code mt-1">${src}</pre>${detail}
+        ${t.debug ? `<div class="small-muted mt-1">DEBUG output</div><pre class="code debug">${esc(t.debug)}</pre>` : ''}</div>`;
+    }).join('');
+    body = `<div class="mb-2">${r.n_passed}/${r.n_tests} tests passed.</div>
+      ${r.debug ? `<div class="small-muted">DEBUG output while defining your code</div><pre class="code debug mb-2">${esc(r.debug)}</pre>` : ''}
+      <div class="d-flex gap-2 mb-2"><button class="btn btn-sm btn-outline-secondary" id="only-fail">Show failing only</button><button class="btn btn-sm btn-outline-secondary" id="show-all">Show all</button></div>
+      <div id="tests">${tests}</div>`;
+  }
+  $('#results').innerHTML = `<div class="card mb-3"><div class="card-header d-flex justify-content-between align-items-center">
+    <span>Submitted answer ${n} <span class="small-muted fw-normal">· ${new Date(sub.at).toLocaleTimeString()}</span></span><span class="badge-score">${badge(sub.score)}</span></div>
+    <div class="card-body">${body}</div></div>`;
+  const filt = only => document.querySelectorAll('#tests .test-row').forEach(el => el.style.display = only && el.textContent.includes('✅') ? 'none' : '');
+  if ($('#only-fail')) { $('#only-fail').onclick = () => filt(true); $('#show-all').onclick = () => filt(false); filt(sub.score < 1 && r.tests.length > 8); }
+}
+
+async function showSolution(qid) {
+  const s = await api('/api/solution/' + qid);
+  $('#solution').innerHTML = `<div class="card mb-3 border-success"><div class="card-header">Reference solution</div><div class="card-body">
+    ${s.uses ? `<p class="small-muted">${esc(s.uses)}</p>` : ''}<pre class="code">${esc(s.solution)}</pre>
+    ${s.explanation ? `<p class="mt-3 mb-0">${esc(s.explanation)}</p>` : ''}</div></div>`;
+}
+
+// ---------- boot ----------
+(async () => {
+  [CATALOG, STATE, SCOPE] = await Promise.all([api('/api/catalog'), api('/api/state'), api('/api/scope')]);
+  if (!SCOPE || !SCOPE.main_topics) {
+    $('#app').innerHTML = `<div class="alert alert-warning">The simulator server is running an older version than this page.
+      Stop it (Ctrl+C in its terminal window) and start it again with <code>start.command</code>, then reload this page.</div>`;
+    return;
+  }
+  STATE.exams = STATE.exams || {}; STATE.practice = STATE.practice || {};
+  // Repair exams that an earlier version closed before they were started.
+  let repaired = false;
+  for (const ex of Object.values(STATE.exams)) {
+    if (ex.finishedAt && (!ex.startedAt || ex.finishedAt < ex.startedAt)) { ex.finishedAt = null; repaired = true; }
+  }
+  if (repaired) saveState();
+  route();
+})();
+</script>
+</body>
+</html>
