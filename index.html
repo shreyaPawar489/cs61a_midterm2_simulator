@@ -222,21 +222,32 @@ function renderHome() {
     <div class="col-lg-5">
       <div class="card mb-4"><div class="card-header">Start a mock Midterm 2 (CBTF format)</div><div class="card-body">
         <p class="mb-2">Four questions drawn from all ${examPool().length} compiled past-paper questions, using the Ed post's topics: one <b>recursion</b> question, one <b>lists and dictionaries</b> question, one <b>linked lists</b> question, and a fourth from any topic (Midterm 1 topics included). Each comes from a different past exam. Problems the Ed post lists with several parts (such as Q5(b)–(c)) count as one question, and you write every part. Questions are ordered from shortest to longest reference solution and are worth 5, 6, 7 and 8 points (26 total). Your score is capped at 20, and getting all four fully correct earns 5 A+ points. Problems from earlier mock exams are skipped until there aren't enough left.</p>
-        <div class="input-group mb-2" style="max-width: 320px"><span class="input-group-text">Time limit</span>
-          <input id="mock-min" type="number" min="0" class="form-control" value="${STATE.lastLimit ?? 60}"><span class="input-group-text">min</span></div>
-        <div class="small-muted mb-3">Use 0 for no time limit. Set this to your real CBTF slot length.</div>
+<div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" role="switch" id="mock-timed" ${STATE.mockTimed ?? true ? 'checked' : ''}>
+          <label class="form-check-label" for="mock-timed">Timed exam</label></div>
+        <div class="input-group mb-2" style="max-width: 320px" id="mock-time-row"><span class="input-group-text">Time limit</span>
+          <input id="mock-min" type="number" min="1" class="form-control" value="${STATE.lastLimit || 60}"><span class="input-group-text">min</span></div>
+        <div class="small-muted mb-3">Turn this off to practice without a clock. When it's on, set it to your real CBTF slot length; you can pause during the exam.</div>
         <button class="btn btn-primary" id="new-mock">Create mock exam</button>
       </div></div>
       <div class="card"><div class="card-header">Or take one whole past paper</div><div class="card-body">
         <select id="paper" class="form-select mb-2">${paperOpts}</select>
-        <div class="input-group mb-3" style="max-width: 320px"><span class="input-group-text">Time limit</span>
-          <input id="paper-min" type="number" min="0" class="form-control" value="0"><span class="input-group-text">min</span></div>
+<div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" role="switch" id="paper-timed" ${STATE.paperTimed ?? false ? 'checked' : ''}>
+          <label class="form-check-label" for="paper-timed">Timed exam</label></div>
+        <div class="input-group mb-2" style="max-width: 320px" id="paper-time-row"><span class="input-group-text">Time limit</span>
+          <input id="paper-min" type="number" min="1" class="form-control" value="${STATE.paperLimit || 60}"><span class="input-group-text">min</span></div><div class="mb-3"></div>
         <button class="btn btn-outline-primary" id="new-paper">Create past-paper exam</button>
       </div></div>
     </div>
   </div>`;
-  $('#new-mock').onclick = () => { const m = Math.max(0, +$('#mock-min').value || 0); STATE.lastLimit = m; location.hash = '#/exam/' + newRandomExam(m); };
-  $('#new-paper').onclick = () => { location.hash = '#/exam/' + newPaperExam($('#paper').value, Math.max(0, +$('#paper-min').value || 0)); };
+  // A switched-off timer disables the minutes box; a timed exam needs at least 1 minute.
+  const timeChoice = p => {
+    const sync = () => { const on = $(`#${p}-timed`).checked; $(`#${p}-min`).disabled = !on; $(`#${p}-time-row`).style.opacity = on ? 1 : .5; };
+    $(`#${p}-timed`).onchange = sync; sync();
+    return () => $(`#${p}-timed`).checked ? Math.max(1, Math.round(+$(`#${p}-min`).value) || 60) : 0;
+  };
+  const mockLimit = timeChoice('mock'), paperLimit = timeChoice('paper');
+  $('#new-mock').onclick = () => { const m = mockLimit(); STATE.mockTimed = m > 0; if (m) STATE.lastLimit = m; location.hash = '#/exam/' + newRandomExam(m); };
+  $('#new-paper').onclick = () => { const m = paperLimit(); STATE.paperTimed = m > 0; if (m) STATE.paperLimit = m; location.hash = '#/exam/' + newPaperExam($('#paper').value, m); };
   document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
     if (confirm('Delete this exam and all its submissions?')) { delete STATE.exams[b.dataset.del]; saveState(); renderHome(); }
   });
@@ -261,7 +272,7 @@ async function renderExamOverview(ex) {
   if (!ex.startedAt) {
     $('#app').innerHTML = `<div class="card mx-auto" style="max-width: 900px"><div class="card-header">${esc(ex.label)}</div><div class="card-body">
       ${instructionsHTML(ex)}<hr>
-      <p class="mb-3"><b>Time limit:</b> ${ex.limitMin ? ex.limitMin + ' minutes' : 'none'}. The timer starts when you click Start, and the exam closes on its own when time runs out.</p>
+      <p class="mb-3"><b>Time limit:</b> ${ex.limitMin ? ex.limitMin + ' minutes. The timer starts when you click Start, and the exam closes on its own when time runs out. You can pause it.' : 'none. This exam stays open until you click Finish assessment.'}</p>
       <button class="btn btn-primary btn-lg" id="start">Start assessment</button></div></div>`;
     fillGuides();
     $('#start').onclick = () => { ex.startedAt = Date.now(); saveState(); route(); };
@@ -287,6 +298,7 @@ async function renderExamOverview(ex) {
       ${ex.aplus ? `<div class="d-flex justify-content-between"><span>Raw points</span><span>${t.raw}/${t.total}</span></div>
       <div class="d-flex justify-content-between"><span>A+ points</span><span>${t.aplus}/${APLUS}</span></div>` : ''}
       ${canPause(ex) ? '<button class="btn btn-outline-secondary w-100 mt-3" id="pause">Pause exam</button>' : ''}
+      ${canPause(ex) ? '<button class="btn btn-link btn-sm w-100 mt-1" id="untime">Remove time limit</button>' : ''}
       ${open ? '<button class="btn btn-danger w-100 mt-2" id="finish">Finish assessment</button>' : ''}
     </div></div>
     ${guidesCard()}
@@ -294,6 +306,11 @@ async function renderExamOverview(ex) {
   fillGuides();
   startTimer(ex);
   if (canPause(ex)) $('#pause').onclick = () => pauseExam(ex);
+  if (canPause(ex)) $('#untime').onclick = () => {
+    if (confirm('Remove the time limit from this exam? The clock stops for good and the exam stays open until you finish it.')) {
+      ex.limitMin = 0; ex.pausedAt = null; saveState(); route();
+    }
+  };
   if (open) $('#finish').onclick = () => {
     if (confirm('Finish the assessment? You will not be able to change your answers.')) { ex.finishedAt = Date.now(); ex.pausedAt = null; saveState(); route(); }
   };
